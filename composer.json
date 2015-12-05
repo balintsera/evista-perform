@@ -17,15 +17,18 @@
         }
     ],
     "require": {
-        "php" : ">=5.5.0"
+        "php" : ">=5.5.0",
+        "symfony/dom-crawler": "^3.0",
+        "symfony/css-selector": "^3.0"
     },
     "require-dev": {
         "phpunit/phpunit" : "4.*",
-        "scrutinizer/ocular": "~1.1"
+        "scrutinizer/ocular": "~1.1",
+        "symfony/var-dumper": "^3.0"
     },
     "autoload": {
         "psr-4": {
-            "Evista\\Perform\\": "src"
+            "Evista\\Perform\\": "src/"
         }
     },
     "autoload-dev": {
