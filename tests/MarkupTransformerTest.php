@@ -34,5 +34,8 @@ class MarkupTransformerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Form\LoginForm', $className);
     }
 
+    public function instantiateFormClassFromMarkup(){
+
+    }
 
 }
