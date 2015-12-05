@@ -5,7 +5,7 @@ namespace Evista\Perform\Test;
 use Evista\Perform\FormMarkupTranspiler;
 use Symfony\Component\DomCrawler\Crawler;
 
-class MarkupTransformerTest extends \PHPUnit_Framework_TestCase
+class MarkuptranspilerTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -16,8 +16,8 @@ class MarkupTransformerTest extends \PHPUnit_Framework_TestCase
         $markup = '<form method="POST" id="custom-form"></form>';
         $crawler  = new Crawler();
 
-        $transformer = new FormMarkupTranspiler($crawler, $markup);
-        $form = $transformer->findFormTag();
+        $transpiler = new FormMarkupTranspiler($crawler, $markup);
+        $form = $transpiler->findFormTag();
         $this->assertInstanceOf('Symfony\Component\DomCrawler\Crawler', $form);
     }
 
@@ -29,12 +29,24 @@ class MarkupTransformerTest extends \PHPUnit_Framework_TestCase
         $markup = '<form method="POST" id="custom-form" '.FormMarkupTranspiler::formClassNameAttrName.'="Form\LoginForm"></form>';
         $crawler  = new Crawler();
 
-        $transformer = new FormMarkupTranspiler($crawler, $markup);
-        $className = $transformer->findFormClassName();
+        $transpiler = new FormMarkupTranspiler($crawler, $markup);
+        $className = $transpiler->findFormClassName();
         $this->assertEquals('Form\LoginForm', $className);
     }
 
+    /**
+     * Instantiate a form class from class name
+     */
     public function instantiateFormClassFromMarkup(){
+        $exampleFormClassName = 'Evista\Perform\Form\ExampleForm'; 
+        $markup = '<form method="POST" id="custom-form" '.FormMarkupTranspiler::formClassNameAttrName.'="Evista\Perform\Form"></form>';
+
+        $crawler  = new Crawler();
+        $transpiler = new FormMarkupTranspiler($crawler, $markup);
+        
+        $formObject = $transpiler->instantiateFormObject();
+
+        $this->assertInstanceOf($exampleFormClassName, $formObject);
 
     }
 
