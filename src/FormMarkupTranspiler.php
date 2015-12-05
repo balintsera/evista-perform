@@ -9,6 +9,8 @@
 namespace Evista\Perform;
 
 
+use Evista\Perform\Form\BaseForm;
+
 class FormMarkupTranspiler
 {
     const formClassNameAttrName = 'data-class';
@@ -54,6 +56,16 @@ class FormMarkupTranspiler
         return $this->formClassName;
     }
 
+    public function instantiateFormObject(){
+        try{
+            $form = new BaseForm();
+        }catch (\Exception $exception){
+            // Now what? This is a problem
+            throw new ClassInstantiationFailed('Class instantiation failed');
+        }
+
+        return $form;
+    }
     /**
      * Init crawler
      */

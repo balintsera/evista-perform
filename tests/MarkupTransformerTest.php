@@ -21,32 +21,21 @@ class MarkuptranspilerTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Symfony\Component\DomCrawler\Crawler', $form);
     }
 
-    /**
-     * Get class from form
-     */
-    public function testFormClassNameFinder()
-    {
-        $markup = '<form method="POST" id="custom-form" '.FormMarkupTranspiler::formClassNameAttrName.'="Form\LoginForm"></form>';
-        $crawler  = new Crawler();
 
-        $transpiler = new FormMarkupTranspiler($crawler, $markup);
-        $className = $transpiler->findFormClassName();
-        $this->assertEquals('Form\LoginForm', $className);
-    }
 
     /**
      * Instantiate a form class from class name
      */
-    public function instantiateFormClassFromMarkup(){
+    public function testInstantiateFormClassFromMarkup(){
         $exampleFormClassName = 'Evista\Perform\Form\ExampleForm'; 
-        $markup = '<form method="POST" id="custom-form" '.FormMarkupTranspiler::formClassNameAttrName.'="Evista\Perform\Form"></form>';
+        $markup = '<form method="POST" id="custom-form"></form>';
 
         $crawler  = new Crawler();
         $transpiler = new FormMarkupTranspiler($crawler, $markup);
         
         $formObject = $transpiler->instantiateFormObject();
 
-        $this->assertInstanceOf($exampleFormClassName, $formObject);
+        $this->assertInstanceOf('Evista\Perform\Form\BaseForm', $formObject);
 
     }
 

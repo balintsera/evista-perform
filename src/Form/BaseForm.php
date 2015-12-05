@@ -10,7 +10,7 @@ use Evista\Perform\ValueObject\FormField;
  * Date: 2015. 10. 14.
  * Time: 9:56
  */
-abstract class BaseForm
+class BaseForm
 {
     private $nonceKey = 'djlKJdlkjei877798a7lskdjf';
     private $nonceValue;
@@ -20,12 +20,10 @@ abstract class BaseForm
     protected $templateName;
     protected $onSubmitCallable;
 
-    /**
-     * This is where a child have to define it's fields
-     * @return mixed
-     */
-    abstract function generateFields();
+    public function generateFields(){
+        // this is where the fields are being generated
 
+    }
 
     public function __construct(){
         // Important: add csrf token to every form
