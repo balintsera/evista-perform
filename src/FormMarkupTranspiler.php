@@ -10,6 +10,8 @@ namespace Evista\Perform;
 
 
 use Evista\Perform\Form\BaseForm;
+use Evista\Perform\ValueObject\FormField;
+use Symfony\Component\DomCrawler\Crawler;
 
 class FormMarkupTranspiler
 {
@@ -20,8 +22,9 @@ class FormMarkupTranspiler
     private $markup;
     private $formTag;
     private $formClassName;
+    private $fields;
 
-    public function __construct($crawler, $markup = false)
+    public function __construct(Crawler $crawler, $markup = false)
     {
         $this->crawler = $crawler;
         $this->markup = $markup;
@@ -66,6 +69,43 @@ class FormMarkupTranspiler
 
         return $form;
     }
+
+    /**
+     * @return array
+     */
+    public function findFields(){
+        $this->runIfNotCached('fields', function(){
+            $this->transpileFields();
+        });
+
+        return $this->fields;
+    }
+
+    /**
+     * Find fields in markup
+     */
+    private function transpileFields(){
+        $this->findFormTag()->filter('input')->each(function (Crawler $node, $i){
+            // If it has a type attr, use as type
+            if(null !== $node->attr('type')){
+                $type = $node->attr('type');
+                $field = new FormField($type);
+            }
+
+            // Otherwise ehhh @TODO finish this
+
+            $field
+                ->setDefault($node->attr('value'))
+                ->setValue($node->attr('value'))
+                ->setName($node->attr('name'));
+            // get attributes like id
+            $attributes = [];
+            $attributes['id'] = $node->attr('id');
+            $attributes['class'] = $node->attr('class');
+            $this->fields[$field->getName()] = $field;
+        });;
+
+    }
     /**
      * Init crawler
      */
@@ -80,7 +120,11 @@ class FormMarkupTranspiler
      */
     private function runIfNotCached($variableName, callable $function){
         if(null === $this->{$variableName}){
-            $this->{$variableName} = $function();
+            // Only assign that don't returns
+            if(null !== $result = $function()){
+                $this->{$variableName} = $result;
+            }
+
         }
     }
 }

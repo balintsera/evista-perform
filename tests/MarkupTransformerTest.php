@@ -42,18 +42,23 @@ class MarkuptranspilerTest extends \PHPUnit_Framework_TestCase
 
     public function testAddTextFieldToFormFromMarkup(){
         $exampleFormClassName = 'Evista\Perform\Form\ExampleForm';
-        $markup = '<form method="POST" id="custom-form"></form>';
-
+        $markup = <<<EOF
+        <form method="POST" id="custom-form">
+            <input type="text" name="your-name" value="Sera Balint" placeholder="Your name"/>
+        </form>
+EOF;
         $crawler  = new Crawler();
         $transpiler = new FormMarkupTranspiler($crawler, $markup);
 
-        $formObject = $transpiler->instantiateFormObject();
+        $fields = $transpiler->findFields();
 
-        $fields = $formObject->findFields();
+        $expectedTextField = new FormField('text');
+        $expectedTextField
+            ->setName("your-name")
+            ->setDefault("Sera Balint")
+            ->setValue("Sera Balint");
 
-        $expected = new FormField();
-
-        $this->assertEquals([new FormField()])
+        $this->assertEquals($expectedTextField, $fields['your-name']);
     }
 
 }
