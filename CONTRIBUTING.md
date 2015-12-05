@@ -2,7 +2,7 @@
 
 Contributions are **welcome** and will be fully **credited**.
 
-We accept contributions via Pull Requests on [Github](https://github.com/:vendor/perform).
+We accept contributions via Pull Requests on [Github](https://github.com/evista/perform).
 
 
 ## Pull Requests
