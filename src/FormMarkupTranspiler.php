@@ -10,6 +10,7 @@ namespace Evista\Perform;
 
 
 use Evista\Perform\Form\BaseForm;
+use Evista\Perform\ValueObject\ExtendedDOMNode;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
 
@@ -86,26 +87,55 @@ class FormMarkupTranspiler
      */
     private function transpileFields(){
         $this->findFormTag()->filter('input')->each(function (Crawler $node, $i){
+
             // If it has a type attr, use as type
             if(null !== $node->attr('type')){
                 $type = $node->attr('type');
-                $field = new FormField($type);
+                $field = new FormField(strtolower($type));
             }
 
             // Otherwise ehhh @TODO finish this
+            else{
+                //what: select - options, checkbox etc
+
+            }
+
+            // get predifined attributes like id
+            $attributes = $this->transpileAttributes($node->getNode(0), ['type', 'name', 'value']);
+            $field->setAttributes($attributes);
+
 
             $field
                 ->setDefault($node->attr('value'))
-                ->setValue($node->attr('value'))
                 ->setName($node->attr('name'));
-            // get attributes like id
-            $attributes = [];
-            $attributes['id'] = $node->attr('id');
-            $attributes['class'] = $node->attr('class');
+
+
             $this->fields[$field->getName()] = $field;
         });;
 
     }
+
+    /**
+     * @param $node
+     * @param array $ignoreList
+     * @return array
+     * @throws \Exception
+     */
+    public function transpileAttributes(\DOMNode $node, $ignoreList = []){
+        $transpiled = [];
+
+        $attributes = $node->attributes;
+
+        foreach($attributes as $attribute){
+            // Jump to next if it's on the ignore list
+            if(in_array($attribute->nodeName, $ignoreList)){
+                continue;
+            };
+            $transpiled[$attribute->nodeName] = $attribute->nodeValue;
+        }
+        return $transpiled;
+    }
+
     /**
      * Init crawler
      */

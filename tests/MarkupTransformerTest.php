@@ -40,11 +40,25 @@ class MarkuptranspilerTest extends \PHPUnit_Framework_TestCase
 
     }
 
+    public function testAttributeTranspilerWithEmtpyInput(){
+        $markup = <<<EOF
+        <form method="POST" id="custom-form">
+            <input type="password"/>
+        </form>
+EOF;
+        $crawler  = new Crawler();
+        $transpiler = new FormMarkupTranspiler($crawler, $markup);
+
+        $fields = $transpiler->findFields();
+        $expectedField = new FormField(FormField::TYPE_PASSWORD);
+        $this->assertEquals($expectedField, $fields['']);
+    }
+
     public function testAddTextFieldToFormFromMarkup(){
         $exampleFormClassName = 'Evista\Perform\Form\ExampleForm';
         $markup = <<<EOF
         <form method="POST" id="custom-form">
-            <input type="text" name="your-name" value="Sera Balint" placeholder="Your name"/>
+            <input type="text" name="your-name" id="your-name" value="Sera Balint" placeholder="Your name"/>
         </form>
 EOF;
         $crawler  = new Crawler();
@@ -56,7 +70,7 @@ EOF;
         $expectedTextField
             ->setName("your-name")
             ->setDefault("Sera Balint")
-            ->setValue("Sera Balint");
+            ->setAttributes(['id' => 'your-name', 'placeholder' => "Your name"]);
 
         $this->assertEquals($expectedTextField, $fields['your-name']);
     }

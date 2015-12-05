@@ -16,6 +16,7 @@ class FormField
     const TYPE_HIDDEN = 'hidden';
     const TYPE_CHECKBOX = 'checkbox';
     const TYPE_TEXTAREA = 'textarea';
+    const TYPE_PASSWORD = 'password';
 
     private $type;
     private $attributes = [];
