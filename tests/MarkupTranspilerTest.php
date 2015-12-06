@@ -5,8 +5,8 @@ namespace Evista\Perform\Test;
 use Evista\Perform\FormMarkupTranspiler;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
-
-class MarkuptranspilerTest extends \PHPUnit_Framework_TestCase
+use Evista\Perform\Factory;
+class MarkupTranspilerTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
@@ -36,7 +36,7 @@ class MarkuptranspilerTest extends \PHPUnit_Framework_TestCase
         
         $formObject = $transpiler->instantiateFormObject();
 
-        $this->assertInstanceOf('Evista\Perform\Form\BaseForm', $formObject);
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $formObject);
 
     }
 
@@ -73,6 +73,23 @@ EOF;
             ->setAttributes(['id' => 'your-name', 'placeholder' => "Your name"]);
 
         $this->assertEquals($expectedTextField, $fields['your-name']);
+    }
+
+    public function testTranspileSimpleLoginForm(){
+        $markup = <<<EOF
+        <form method="post" action="/login" id="login-form">
+            <input type="email" name="email" placeholder="Your email" value="">
+            <input type="password" name="password" value="">
+            <button value="login" id="login-button">Login</button>
+        </form>
+EOF;
+        $factory = new Factory(new Crawler());
+        $form = $factory->transpileForm($markup);
+
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+
+        $this->assertEquals('email', $form->getFields()['email']->getType());
+        $this->assertEquals('password', $form->getFields()['password']->getType());
     }
 
 }

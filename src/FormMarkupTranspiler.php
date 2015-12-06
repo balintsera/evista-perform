@@ -9,7 +9,7 @@
 namespace Evista\Perform;
 
 
-use Evista\Perform\Form\BaseForm;
+use Evista\Perform\Form\Form;
 use Evista\Perform\ValueObject\ExtendedDOMNode;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
@@ -62,7 +62,7 @@ class FormMarkupTranspiler
 
     public function instantiateFormObject(){
         try{
-            $form = new BaseForm();
+            $form = new Form();
         }catch (\Exception $exception){
             // Now what? This is a problem
             throw new ClassInstantiationFailed('Class instantiation failed');
@@ -113,6 +113,7 @@ class FormMarkupTranspiler
             $this->fields[$field->getName()] = $field;
         });;
 
+        return $this->fields;
     }
 
     /**

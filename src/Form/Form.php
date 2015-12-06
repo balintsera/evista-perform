@@ -10,7 +10,7 @@ use Evista\Perform\ValueObject\FormField;
  * Date: 2015. 10. 14.
  * Time: 9:56
  */
-class BaseForm
+class Form
 {
     private $nonceKey = 'djlKJdlkjei877798a7lskdjf';
     private $nonceValue;
@@ -286,6 +286,17 @@ class BaseForm
     public function getField($key){
         return $this->formFields[$key];
     }
+
+    /**
+     * Add fields to the form
+     * @param array $fields
+     */
+    public function addFields(array $fields){
+        array_walk($fields, function($field, $key){
+            $this->addField($key, $field);
+        });
+    }
+
 
     /**
      * Adds fields to template vars
