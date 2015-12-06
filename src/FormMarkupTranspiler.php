@@ -109,8 +109,19 @@ class FormMarkupTranspiler
                 ->setDefault($node->attr('value'))
                 ->setName($node->attr('name'));
 
+            // Pattern validation callback
+            if(array_key_exists('pattern',$attributes)){
+                $pattern = $attributes['pattern'];
+                $field->setValidationCallback(function($value) use ($pattern){
+                    if(preg_match('/'.$pattern.'/', $value)){
+                        return false; // it's valid!
+                    }
+                    return true;
+                });
+            }
 
             $this->fields[$field->getName()] = $field;
+
         });;
 
         return $this->fields;

@@ -6,6 +6,7 @@ use Evista\Perform\FormMarkupTranspiler;
 use Evista\Perform\Service;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
+use Evista\Perform\Form\Form;
 
 class MarkupTranspilerTest extends \PHPUnit_Framework_TestCase
 {
@@ -93,4 +94,23 @@ EOF;
         $this->assertEquals('password', $form->getFields()['password']->getType());
     }
 
+
+    // pattern="banana|cherry"
+    public function testPatternValidation(){
+        $markup = <<<EOF
+         <form method="post" action="/login" id="login-form">
+            <input type="email" name="email" placeholder="Your email" value="" pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$">
+          </form>
+EOF;
+        $factory = new Service(new Crawler());
+        // Faking post
+        $_POST['email'] = 'balint.sera@gmail.com';
+        /** @var Form $form */
+        $form = $factory->transpileForm($markup);
+        $form->populateFields();
+
+        $errors = $form->validate();
+        $this->assertEquals(0, count($errors));
+
+    }
 }

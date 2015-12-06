@@ -195,7 +195,6 @@ class Form
                     return true;
                 }
 
-
                 $validationResult = $field->validate();
                 if($validationResult){
                     $errors[$field->getName()] =
