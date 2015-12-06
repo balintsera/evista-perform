@@ -29,6 +29,7 @@ class FormField
     private $sanitizationCallback;
     private $validationCallback;
     private $label; // only checkboxes self::TYPE_CHECKBOX
+    private $valid;
 
     public function __construct($type){
         $this->type = $type;
@@ -244,10 +245,20 @@ class FormField
     }
 
 
+
     public function validate(){
         $validateFunction = $this->validationCallback;
-        return $validateFunction($this->getValue());
+        $valid = $validateFunction($this->getValue());
+        if($valid){
+            $this->valid = false;
+        }else{
+            $this->valid = true;
+        }
+        return $valid;
     }
 
+    public function isValid(){
+        return $this->valid;
+    }
 
 }

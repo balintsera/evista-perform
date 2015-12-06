@@ -10,6 +10,7 @@ namespace Evista\Perform\Form;
 
 
 use Evista\Perform\FormMarkupTranspiler;
+use Evista\Perform\Form\Form;
 
 class TranspiledForm
 {
@@ -37,12 +38,17 @@ class TranspiledForm
      */
     public function transpile(){
         // Form
+        /** @var Form form */
         $this->form = $this->transpiler->instantiateFormObject();
 
         // Fields
         $this->form->addFields($this->transpiler->findFields());
 
-        // Validations
+        // Populate
+        $this->form->populateFields();
+
+        // Validate
+        $this->form->validate();
 
         return $this->form;
     }
