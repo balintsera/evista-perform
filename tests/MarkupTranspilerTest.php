@@ -3,9 +3,10 @@
 namespace Evista\Perform\Test;
 
 use Evista\Perform\FormMarkupTranspiler;
+use Evista\Perform\Service;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
-use Evista\Perform\Factory;
+
 class MarkupTranspilerTest extends \PHPUnit_Framework_TestCase
 {
 
@@ -83,7 +84,7 @@ EOF;
             <button value="login" id="login-button">Login</button>
         </form>
 EOF;
-        $factory = new Factory(new Crawler());
+        $factory = new Service(new Crawler());
         $form = $factory->transpileForm($markup);
 
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);

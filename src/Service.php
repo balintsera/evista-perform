@@ -9,9 +9,8 @@
 namespace Evista\Perform;
 
 use Evista\Perform\Form\TranspiledForm;
-use Evista\Perform\FormMarkupTranspiler;
 
-class Factory
+class Service
 {
     private $crawler;
 
