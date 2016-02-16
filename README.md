@@ -25,6 +25,9 @@ $ composer require evista/perform
 $form = new Evista\Perform();
 ```
 
+There is a usage example of this package in this [repo](https://github.com/balintsera/evista-perform-example) 
+
+
 ## Change log
 
 Please see [CHANGELOG](CHANGELOG.md) for more information what has changed recently.
