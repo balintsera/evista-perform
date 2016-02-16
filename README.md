@@ -8,7 +8,7 @@
 [![Total Downloads][ico-downloads]][link-downloads]
 
 
-A reverse Form API that builds and processes forms automatically - from markup.PSRs you support to avoid any confusion with users and contributors.
+A reverse Form API that builds and processes forms automatically - from markup.
 
 
 ## Install
@@ -25,7 +25,75 @@ $ composer require evista/perform
 $form = new Evista\Perform();
 ```
 
-There is a usage example of this package in this [repo](https://github.com/balintsera/evista-perform-example) 
+Perform is based on a simple concept: build your form in plain ol' html in any template or any frontend flavour like React.js and send it to the server.  The backend will take care of building a form object _from the markup,_ _populate_ it from the request and run your _validations_ and then call any callable you define.
+
+This differentiate it from all the other PHP form APIs, because there's no need to build any form object on the server side _before_ submission.
+
+Here is an example of a server side from building process:
+
+
+```php
+use Evista\Perform\Service;
+
+// (...)
+
+// Initialize form transpilation service (dependency injection friendly interface)
+$formService = new Service($crawler);
+
+
+$router->addRoute('POST', '/loginform', function (Request $request, Response $response) use($twig, $crawler, $formService) {
+    $formMarkup = $request->request->get('serform');
+    $form = $formService->transpileForm($formMarkup);
+    $response = new JsonResponse(['dump'=>(var_export($form, true))]);
+    return $response;
+});
+```
+
+After initializing the form builder call `transpileForm()` to build a Form object from the markup.
+
+
+```php
+$formMarkup = $request->request->get('serform');
+$form = $formService->transpileForm($formMarkup);
+```
+
+The markup arrives with the submitted datas in the 'serform' post parameter.
+
+For example, this markup:
+
+
+```html
+<form method="post" action="/login" id="login-form">
+    <input type="email" name="email" placeholder="Your email" value="" pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$">
+    <input type="password" name="password" value="">
+    <button value="login" id="login-button">Login</button>
+</form>
+
+```
+
+Nothing special, validations are attached to the inputs etc.
+
+The only trick is the sendig of the form markup via javascipt to enable the server side processing.
+
+
+```javascript
+var form = document.getElementById('login-form');
+var el = document.getElementById('login-button');
+el.addEventListener('click', function (event) {
+     console.log('click');
+     event.preventDefault();
+     var data = form.serialize();
+     data += '&serform='+encodeURIComponent(form.outerHTML);
+     console.log(data);
+     post('/loginform', data, function(response){
+       // do something with the response
+       // (...)
+```
+
+
+
+There is a usage example of the package in this [repo](https://github.com/balintsera/evista-perform-example).
+
 
 
 ## Change log
