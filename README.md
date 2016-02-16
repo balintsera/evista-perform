@@ -22,7 +22,9 @@ $ composer require evista/perform
 ## Usage
 
 ``` php
-$form = new Evista\Perform();
+$formService = new Service($crawler);
+// Get form markup from the request to $formMarkup
+$form = $formService->transpileForm($formMarkup);
 ```
 
 Perform is based on a simple concept: build your form in plain ol' html in any template or any frontend flavour like React.js and send it to the server.  The backend will take care of building a form object _from the markup,_ _populate_ it from the request and run your _validations_ and then call any callable you define.
@@ -41,15 +43,21 @@ use Evista\Perform\Service;
 $formService = new Service($crawler);
 
 
-$router->addRoute('POST', '/loginform', function (Request $request, Response $response) use($twig, $crawler, $formService) {
+$router->addRoute('POST', '/loginform', function (Request $request, Response $response) use($formService) {
     $formMarkup = $request->request->get('serform');
     $form = $formService->transpileForm($formMarkup);
+
+    // Do whatever you need to with the datas
+
+
+    // Then send some response
     $response = new JsonResponse(['dump'=>(var_export($form, true))]);
     return $response;
 });
 ```
 
-After initializing the form builder call `transpileForm()` to build a Form object from the markup.
+After initializing the form builder call `transpileForm()` to build a Form object from the markup. The there's some helpful class methods to do whatever you have to, for example `getField($name)` to get any field's value.
+
 
 
 ```php
@@ -57,9 +65,7 @@ $formMarkup = $request->request->get('serform');
 $form = $formService->transpileForm($formMarkup);
 ```
 
-The markup arrives with the submitted datas in the 'serform' post parameter.
-
-For example, this markup:
+The markup arrives with the submitted datas in the 'serform' post parameter. For example, this markup:
 
 
 ```html
@@ -71,9 +77,7 @@ For example, this markup:
 
 ```
 
-Nothing special, validations are attached to the inputs etc.
-
-The only trick is the sendig of the form markup via javascipt to enable the server side processing.
+There's nothing special in it, exept maybe the HTML5 validations that are attached to the inputs with the pattern attribute. The only tricky moment is the sending of the form's markup in the `serform` parameter via javascipt to enable server side processing.
 
 
 ```javascript
