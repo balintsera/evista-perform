@@ -86,19 +86,17 @@ class FormMarkupTranspiler
      * Find fields in markup
      */
     private function transpileFields(){
-        $this->findFormTag()->filter('input')->each(function (Crawler $node, $i){
+        $this->findFormTag()->filter('input, select, textarea')->each(function (Crawler $node, $i){
 
             // If it has a type attr, use as type
             if(null !== $node->attr('type')){
                 $type = $node->attr('type');
-                $field = new FormField(strtolower($type));
             }
-
-            // Otherwise ehhh @TODO finish this
             else{
-                //what: select - options, checkbox etc
-
+                $type = $node->nodeName();
             }
+
+            $field = new FormField(strtolower($type));
 
             // get predifined attributes like id
             $attributes = $this->transpileAttributes($node->getNode(0), ['type', 'name', 'value']);
