@@ -102,10 +102,9 @@ class FormMarkupTranspiler
             $attributes = $this->transpileAttributes($node->getNode(0), ['type', 'name', 'value']);
             $field->setAttributes($attributes);
 
-
             $field
                 ->setDefault($node->attr('value'))
-                ->setName($node->attr('name'));
+                ->setName(str_replace('\"', '', $node->attr('name')));
 
             // Pattern validation callback
             if(array_key_exists('pattern',$attributes)){
@@ -117,6 +116,9 @@ class FormMarkupTranspiler
                     return true;
                 });
             }
+
+            // Set madatory if required
+            if(array_key_exists('required', $attributes)) $field->setMandatory(true);
 
             $this->fields[$field->getName()] = $field;
 
