@@ -9,9 +9,12 @@
 namespace Evista\Perform\ValueObject;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 class FormField
 {
     const TYPE_TEXT_INPUT = 'input';
+    const TYPE_PASSWORD = 'password';
     const TYPE_SUBMIT = 'submit' ;
     const TYPE_HIDDEN = 'hidden';
     const TYPE_CHECKBOX = 'checkbox';
@@ -19,6 +22,8 @@ class FormField
     const TYPE_SELECT = 'select';
     const TYPE_BUTTON = 'button';
     const TYPE_FILE = 'file';
+    const TYPE_OPTION = 'option';
+
 
 
     private $type;
@@ -50,7 +55,12 @@ class FormField
             case self::TYPE_BUTTON:
                 $this->tagName = 'button';
                 break;
+            case self::TYPE_OPTION:
+                $this->tagName = 'option';
+                break;
         }
+
+        $this->options = new ArrayCollection();
     }
 
     /**
@@ -87,6 +97,28 @@ class FormField
     public function setAttributes($attributes)
     {
         $this->attributes = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * @param $options
+     * @return $this
+     */
+    public function addOption($options)
+    {
+        $this->options[] = $options;
+
+        return $this;
+    }
+
+    /**
+     * @param $option
+     * @return $this
+     */
+    public function removeOption($option)
+    {
+        $this->options->removeElement($option);
 
         return $this;
     }

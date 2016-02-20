@@ -86,7 +86,9 @@ class FormMarkupTranspiler
      * Find fields in markup
      */
     private function transpileFields(){
-        $this->findFormTag()->filter('input, select, textarea')->each(function (Crawler $node, $i){
+        $formElements = 'input, select, textarea, button';
+
+        $this->findFormTag()->filter($formElements)->each(function (Crawler $node, $i){
 
             // If it has a type attr, use as type
             if(null !== $node->attr('type')){
@@ -96,35 +98,70 @@ class FormMarkupTranspiler
                 $type = $node->nodeName();
             }
 
-            $field = new FormField(strtolower($type));
 
-            // get predifined attributes like id
-            $attributes = $this->transpileAttributes($node->getNode(0), ['type', 'name', 'value']);
-            $field->setAttributes($attributes);
+            // Create a FormField and get default attributes (name, value, validation, required)
+            $field = $this->fieldFactory($type, $node);
 
-            $field
-                ->setDefault($node->attr('value'))
-                ->setName(str_replace('\"', '', $node->attr('name')));
 
-            // Pattern validation callback
-            if(array_key_exists('pattern',$attributes)){
-                $pattern = $attributes['pattern'];
-                $field->setValidationCallback(function($value) use ($pattern){
-                    if(preg_match('/'.$pattern.'/', $value)){
-                        return false; // it's valid!
-                    }
-                    return true;
+            // complex form elements 1: select -> options
+            if ($type === 'select') {
+                $options = $node->filter('option');
+
+                // FormField
+                $options->each(function ($option) use ($field) {
+                    $optionField = $this->fieldFactory('option', $option);
+                    $field->addOption($optionField);
                 });
             }
 
-            // Set madatory if required
-            if(array_key_exists('required', $attributes)) $field->setMandatory(true);
 
+            // Add to all fields
             $this->fields[$field->getName()] = $field;
 
         });;
 
         return $this->fields;
+    }
+
+    /**
+     * @param string type
+     * @param $node
+     * @return FormField
+     */
+    public function fieldFactory($type, $node)
+    {
+        // Instantiate a field object
+        $field = new FormField(strtolower($type));
+
+        // Get predifined attributes like id
+        $attributes = $this->transpileAttributes($node->getNode(0), ['type', 'name', 'value']);
+        $field->setAttributes($attributes);
+
+        // Pattern validation callback
+        if(array_key_exists('pattern', $attributes)){
+            $pattern = $attributes['pattern'];
+            $field->setValidationCallback(function($value) use ($pattern){
+                if(preg_match('/'.$pattern.'/', $value)){
+                    return false; // it's valid!
+                }
+                return true;
+            });
+        }
+
+        // Add value
+        $field
+            ->setDefault($node->attr('value'))
+            ->setName(str_replace('\"', '', $node->attr('name')));
+
+        // Set madatory if required
+        if(array_key_exists('required', $attributes)) $field->setMandatory(true);
+
+        return $field;
+    }
+
+    public function processSelects($selectNode)
+    {
+
     }
 
     /**

@@ -113,4 +113,35 @@ EOF;
         $this->assertEquals(0, count($errors));
 
     }
+
+    public function testSelectTranspilation()
+    {
+        $markup = <<<EOF
+        <form method="post" action="/login" id="login-form">
+           <select name="test-select">
+              <option value="volvo">Volvo</option>
+              <option value="saab" selected>Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option>
+            </select>
+        </form>
+EOF;
+        $factory = new Service(new Crawler());
+        $form = $factory->transpileForm($markup);
+
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+
+        $selectField = $form->getFields()['test-select'];
+
+        $options = $selectField->getOptions();
+
+        $this->assertEquals('option', $options[0]->getTagName());
+        $this->assertEquals('volvo', $options[0]->getDefault());
+        $this->assertEquals('saab', $options[1]->getDefault());
+        $this->assertEquals(["selected" => "selected"], $options[1]->getAttributes());
+
+        $this->assertEquals('mercedes', $options[2]->getDefault());
+        $this->assertEquals('audi', $options[3]->getDefault());
+        $this->assertEquals('select', $form->getFields()['test-select']->getType());
+    }
 }
