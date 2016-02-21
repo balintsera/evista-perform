@@ -387,8 +387,23 @@ class FormField
         return $this;
     }
 
+    /**
+     * @param $error
+     */
     public function addError($error)
     {
         $this->errors[] = $error;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        if (count($this->errors) > 0) {
+            return true;
+        }
+
+        return false;
     }
 }

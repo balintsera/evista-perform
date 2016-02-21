@@ -198,4 +198,34 @@ EOF;
 
         $this->assertEquals('saab', $selected->getDefault());
     }
+
+    public function testValidation()
+    {
+        $markup = <<<EOF
+        <form method="post" action="/login" id="login-form">
+            <input
+            type="email"
+            name="email"
+            placeholder="Your email"
+            value=""
+            pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$"
+            >
+            <input type="password" name="password" value="">
+            <textarea name="test_textarea"></textarea>
+            <select name="test-select">
+                <option value="volvo">Volvo</option>
+                <option value="saab" selected>Saab</option>
+                <option value="mercedes">Mercedes</option>
+                <option value="audi">Audi</option>
+            </select>
+            <button value="login" id="login-button">Login</button>
+        </form>
+EOF;
+        $factory = new Service(new Crawler());
+        $form = $factory->transpileForm($markup);
+
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+
+        //@TODO Mock POST processing?
+    }
 }

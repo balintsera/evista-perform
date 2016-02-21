@@ -16,10 +16,13 @@ class Form
     private $nonceKey = 'djlKJdlkjei877798a7lskdjf';
     private $nonceValue;
     private $submittedData;
+    private $postData;
+
     protected $formFields = [];
     protected $templateVars = ['form_fields' => []];
     protected $templateName;
     protected $onSubmitCallable;
+
 
     public function __construct()
     {
@@ -318,20 +321,36 @@ class Form
     }
 
     /**
-     * @return mixed
+     * @return bool
      */
-    public function getTemplate()
+    public function isValid()
     {
-        return $this->templateName;
+        // Iterate trough all fields and return false if any error found in any of them
+        foreach ($this->getFields() as $field) {
+            if (!$field->isValid()) {
+                return false;
+            }
+        }
+
+        // No errors found
+        return true;
     }
 
     /**
-     * @param mixed $template
-     * @return BaseForm
+     * @return mixed
      */
-    public function setTemplate($template)
+    public function getPostData()
     {
-        $this->templateName = $template;
+        return $this->postData;
+    }
+
+    /**
+     * @param mixed $postData
+     * @return Form
+     */
+    public function setPostData($postData)
+    {
+        $this->postData = $postData;
 
         return $this;
     }
