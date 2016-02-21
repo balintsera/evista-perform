@@ -27,7 +27,7 @@ $formService = new Service($crawler);
 $form = $formService->transpileForm($formMarkup);
 ```
 
-Perform is based on a simple concept: build your form in plain ol' html in any template or any frontend flavour like React.js and send it to the server.  The backend will take care of building a form object _from the markup,_ _populate_ it from the request and run your _validations_ and then call any callable you define.
+Perform is based on a simple concept: build your form in plain ol' html in any template or any frontend like React.js then send it to the server.  The backend will take care of building a form object _from your markup,_ _populate_ it from the request, and run your _validations_.
 
 This differentiate it from all the other PHP form APIs, because there's no need to build any form object on the server side _before_ submission.
 
@@ -47,13 +47,15 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
     $formMarkup = $request->request->get('serform');
     $form = $formService->transpileForm($formMarkup);
 
-    // Do whatever you need to with the datas
     // Get fields:
     $fields = $form->getFields();
 
-    // Use email
+    // Get an input field named 'email'
     $emailField = $form->getField('email');
-
+    
+    // Get the field's submitted value
+    $emailField->getValue();
+    
     // Get attributes, eg. placeholder:
     $placeholder = $emailField->getAttribute('placeholder');
 
@@ -61,9 +63,8 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
     $selectField = $form->getField('test-select');
     $selected = $selectField->getValue();
 
-    // Get defaultly selected option (that was set selected in markup)
+    // Get the default selected option (that is selected in markup)
     $defaultSelected = $selectField->getDefaultSelectedOption();
-
 
     // Then send some response
     $response = new JsonResponse(['dump'=>(var_export($form, true))]);
