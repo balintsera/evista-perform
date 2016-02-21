@@ -31,7 +31,7 @@ Perform is based on a simple concept: build your form in plain ol' html in any t
 
 This differentiate it from all the other PHP form APIs, because there's no need to build any form object on the server side _before_ submission.
 
-Here is an example of a server side from building process:
+Here is an example of a server side form building process:
 
 
 ```php
