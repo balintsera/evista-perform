@@ -29,7 +29,7 @@ $form = $formService->transpileForm($formMarkup);
 
 Perform is based on a simple concept: build your form in plain ol' html in any template or any frontend like React.js then send it to the server.  The backend will take care of building a form object _from your markup,_ _populate_ it from the request, and run your _validations_.
 
-This differentiate it from all the other PHP form APIs, because there's no need to build any form object on the server side _before_ submission.
+This differentiates it from all the other PHP form APIs, because there's no need to build any form object on the server side _before_ submission.
 
 Here is an example of a server side form building process:
 
