@@ -66,6 +66,16 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
     // Get the default selected option (that is selected in markup)
     $defaultSelected = $selectField->getDefaultSelectedOption();
 
+     // Check validity
+    if (!$form->isValid()) {
+        // All errors can be spotted in the fields
+        foreach ($form->getFields() as $field) {
+            if (!$field->isValid()) {
+                $validationErrors[] = $field->getErrors();
+            }
+        }
+    }
+    
     // Then send some response
     $response = new JsonResponse(['dump'=>(var_export($form, true))]);
     return $response;
