@@ -9,6 +9,7 @@
 namespace Evista\Perform;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Evista\Perform\Form\Form;
 use Evista\Perform\ValueObject\ExtendedDOMNode;
 use Evista\Perform\ValueObject\FormField;

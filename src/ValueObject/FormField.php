@@ -8,8 +8,8 @@
 
 namespace Evista\Perform\ValueObject;
 
-
 use Doctrine\Common\Collections\ArrayCollection;
+use Evista\Perform\Exception\FormFieldException;
 
 class FormField
 {
@@ -99,6 +99,34 @@ class FormField
         $this->attributes = $attributes;
 
         return $this;
+    }
+
+    /**
+     * @param $key
+     * @param $value
+     * @return $this
+     */
+    public function addAttribute($key, $value)
+    {
+        $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+
+
+    /**
+     * @param $attributeName
+     * @return mixed|null
+     * @throws FormFieldException;
+     */
+    public function getAttribute($attributeName)
+    {
+        if(! array_key_exists($attributeName, $this->attributes)) {
+            throw FormFieldException::NoSuchAttribute($attributeName, $this->getName());
+        }
+
+        return $this->attributes[$attributeName];
     }
 
     /**
