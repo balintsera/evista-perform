@@ -147,7 +147,9 @@ If you discover any security related issues, please email balint.sera@gmail.com 
 ## Credits
 
 - [Balint Sera][link-author]
+- [Zsolt Schutzbach][https://github.com/succli]
 - [All Contributors][link-contributors]
+- [Evista Creative Agency][http://evista-agency.com]
 
 ## License
 
