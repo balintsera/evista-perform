@@ -337,6 +337,29 @@ class FormField
         return $validateFunction($this->getValue());
     }
 
+    public function getDefaultSelectedOption()
+    {
+        if ($this->type !== self::TYPE_SELECT) {
+           throw FormFieldException::notASelect($this->tagName);
+        }
 
+        $selecteds = [];
+        foreach($this->options as $option) {
+            try {
+                // If the option has a select  attribute its seleted
+                $optionSelected = $option->getAttribute('selected');
+                $selecteds[] = $option;
+            } catch(FormFieldException $exception) {
+                continue;
+            }
+        }
+
+        // Send back the first
+        if (count($selecteds) > 0) {
+            return $selecteds[0];
+        }
+
+        return false;
+    }
 
 }

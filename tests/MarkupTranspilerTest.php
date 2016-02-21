@@ -175,7 +175,7 @@ EOF;
         }
     }
 
-    public function getSelectedOption()
+    public function testGetSelectedOption()
     {
         $markup = <<<EOF
         <form method="post" action="/login" id="login-form">
@@ -194,7 +194,8 @@ EOF;
 
         $selectField = $form->getField('test-select');
 
-        $selected = $selectField->getSelected();
+        $selected = $selectField->getDefaultSelectedOption();
 
+        $this->assertEquals('saab', $selected->getDefault());
     }
 }
