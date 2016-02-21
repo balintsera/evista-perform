@@ -48,6 +48,21 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
     $form = $formService->transpileForm($formMarkup);
 
     // Do whatever you need to with the datas
+    // Get fields:
+    $fields = $form->getFields();
+
+    // Use email
+    $emailField = $form->getField('email');
+
+    // Get attributes, eg. placeholder:
+    $placeholder = $emailField->getAttribute('placeholder');
+
+    // Get selected option:
+    $selectField = $form->getField('test-select');
+    $selected = $selectField->getValue();
+
+    // Get defaultly selected option (that was set selected in markup)
+    $defaultSelected = $selectField->getDefaultSelectedOption();
 
 
     // Then send some response
