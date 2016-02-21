@@ -151,7 +151,7 @@ The MIT License (MIT). Please see [License File](LICENSE.md) for more informatio
 [ico-downloads]: https://img.shields.io/packagist/dt/evista/perform.svg?style=flat-square
 
 [link-packagist]: https://packagist.org/packages/evista/perform
-[link-travis]: https://travis-ci.org/balintsera/evista-perform
+[link-travis]: https://travis-ci.org/balintsera/evista-perform.svg?branch=master
 [link-scrutinizer]: https://scrutinizer-ci.com/g/evista/perform/code-structure
 [link-code-quality]: https://scrutinizer-ci.com/g/evista/perform
 [link-downloads]: https://packagist.org/packages/evista/perform
