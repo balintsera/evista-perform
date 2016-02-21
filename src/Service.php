@@ -25,7 +25,8 @@ class Service
      * @param $markup
      * @return mixed
      */
-    public function transpileForm($markup){
+    public function transpileForm($markup)
+    {
         $transpiledForm = new TranspiledForm($markup, $this->crawler);
 
         // Return the result form object

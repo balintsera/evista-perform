@@ -15,7 +15,7 @@ class FormField
 {
     const TYPE_TEXT_INPUT = 'input';
     const TYPE_PASSWORD = 'password';
-    const TYPE_SUBMIT = 'submit' ;
+    const TYPE_SUBMIT = 'submit';
     const TYPE_HIDDEN = 'hidden';
     const TYPE_CHECKBOX = 'checkbox';
     const TYPE_TEXTAREA = 'textarea';
@@ -25,27 +25,32 @@ class FormField
     const TYPE_OPTION = 'option';
 
 
-
     private $type;
     private $attributes = [];
     private $name;
     private $value;
     private $default;
     private $tagName = 'input';
-    private $mandatory = FALSE;
+    private $mandatory = false;
     private $sanitizationCallback;
     private $validationCallback;
     private $label; // only checkboxes self::TYPE_CHECKBOX
     private $options = []; // only select self::TYPE_SELECT
+    private $errors = [];
 
-    public function __construct($type){
+    public function __construct($type)
+    {
         $this->type = $type;
 
         // Default callbacks do nothing, just returns the original
-        $this->sanitizationCallback = function($value){ return $value; };
-        $this->validationCallback = function($value){ return false; };
+        $this->sanitizationCallback = function ($value) {
+            return $value;
+        };
+        $this->validationCallback = function ($value) {
+            return false;
+        };
 
-        switch($this->type){
+        switch ($this->type) {
             case self::TYPE_TEXTAREA:
                 $this->tagName = 'textarea';
                 break;
@@ -114,7 +119,6 @@ class FormField
     }
 
 
-
     /**
      * @param $attributeName
      * @return mixed|null
@@ -122,7 +126,7 @@ class FormField
      */
     public function getAttribute($attributeName)
     {
-        if(! array_key_exists($attributeName, $this->attributes)) {
+        if (!array_key_exists($attributeName, $this->attributes)) {
             throw FormFieldException::NoSuchAttribute($attributeName, $this->getName());
         }
 
@@ -305,10 +309,10 @@ class FormField
     }
 
 
-
-
-    public function sanitize($inputValue){
+    public function sanitize($inputValue)
+    {
         $function = $this->sanitizationCallback;
+
         return $function($inputValue);
     }
 
@@ -332,24 +336,26 @@ class FormField
     }
 
 
-    public function validate(){
+    public function validate()
+    {
         $validateFunction = $this->validationCallback;
+
         return $validateFunction($this->getValue());
     }
 
     public function getDefaultSelectedOption()
     {
         if ($this->type !== self::TYPE_SELECT) {
-           throw FormFieldException::notASelect($this->tagName);
+            throw FormFieldException::notASelect($this->tagName);
         }
 
         $selecteds = [];
-        foreach($this->options as $option) {
+        foreach ($this->options as $option) {
             try {
                 // If the option has a select  attribute its seleted
                 $optionSelected = $option->getAttribute('selected');
                 $selecteds[] = $option;
-            } catch(FormFieldException $exception) {
+            } catch (FormFieldException $exception) {
                 continue;
             }
         }
@@ -362,4 +368,27 @@ class FormField
         return false;
     }
 
+    /**
+     * @return array
+     */
+    public function getErrors()
+    {
+        return $this->errors;
+    }
+
+    /**
+     * @param array $errors
+     * @return FormField
+     */
+    public function setErrors($errors)
+    {
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    public function addError($error)
+    {
+        $this->errors[] = $error;
+    }
 }

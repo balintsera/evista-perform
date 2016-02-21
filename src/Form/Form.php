@@ -2,6 +2,7 @@
 
 namespace Evista\Perform\Form;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Evista\Perform\ValueObject\FormField;
 
 /**
@@ -16,16 +17,15 @@ class Form
     private $nonceValue;
     private $submittedData;
     protected $formFields = [];
-    protected $templateVars = ['form_fields' =>[]];
+    protected $templateVars = ['form_fields' => []];
     protected $templateName;
     protected $onSubmitCallable;
 
-    public function generateFields(){
-        // this is where the fields are being generated
+    public function __construct()
+    {
+        $this->formErrors = new ArrayCollection();
 
-    }
 
-    public function __construct(){
         // Important: add csrf token to every form
         $this->addCSRFTokenField();
 
@@ -45,9 +45,6 @@ class Form
         // Setup submission
         $this->setSubmittedDatasFromPost();
 
-        // Add child fields
-        $this->generateFields();
-
         // Add fields to template variables
         $this->addFieldsToTemplateVars();
 
@@ -61,19 +58,22 @@ class Form
      * Handles submission - it's better not to call automatically
      * @throws \NoCallbackSetException
      */
-    public function handleSubmission(){
+    public function handleSubmission()
+    {
         // When posted
         if (null !== $this->getSubmittedData()['nonce']) {
             $this->runOnSubmit();
         }
     }
 
-    public function onSubmit(Callable $callable){
+    public function onSubmit(callable $callable)
+    {
         $this->onSubmitCallable = $callable;
     }
 
-    private function runOnSubmit(){
-        if(null === $this->onSubmitCallable){
+    private function runOnSubmit()
+    {
+        if (null === $this->onSubmitCallable) {
             throw new \NoCallbackSetException('onSubmit callable is not set');
         }
         $callable = $this->onSubmitCallable;
@@ -81,21 +81,25 @@ class Form
     }
 
 
-
     /**
      * Get submitted values (independently of submission method eg. ajax / simple)
      */
-    private function setSubmittedDatasFromPost(){
-        if(null !== $_POST){
+    private function setSubmittedDatasFromPost()
+    {
+        if (null !== $_POST) {
             // If ajax, check formData parameter
-            if(!empty($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest') {
+            if (!empty($_SERVER['HTTP_X_REQUESTED_WITH'])
+                && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) == 'xmlhttprequest'
+            ) {
                 $keyValuePairs = explode('&', $_POST['formData']);
-                array_walk($keyValuePairs, function($value){
-                    list($key, $postValue) = explode('=', $value);
-                    $this->submittedData[$key] = urldecode($postValue);
-                });
-            }
-            else{
+                array_walk(
+                    $keyValuePairs,
+                    function ($value) {
+                        list($key, $postValue) = explode('=', $value);
+                        $this->submittedData[$key] = urldecode($postValue);
+                    }
+                );
+            } else {
                 $this->submittedData = $_POST;
             }
         }
@@ -104,32 +108,32 @@ class Form
     /**
      * Add CSRF token hidden input field
      */
-    private function addCSRFTokenField(){
+    private function addCSRFTokenField()
+    {
         $this->nonceValue = $this->createNonce();
         $nonce = new FormField(FormField::TYPE_HIDDEN);
         $nonce
             ->setName('nonce')
             ->setValue($this->createNonce())
-            ->setValidationCallback(function($value){
-                if(function_exists('wp_verify_nonce')){
+            ->setValidationCallback(
+                function ($value) {
+                    if (function_exists('wp_verify_nonce')) {
 
-                    if(!wp_verify_nonce($value, $this->nonceKey)){
-                        throw new \Exception('Unauthorized request');
+                        if (!wp_verify_nonce($value, $this->nonceKey)) {
+                            throw new \Exception('Unauthorized request');
+                        }
+                    } // Use own csrf token
+                    else {
+                        if (!isset($_SESSION['csrf_tokens'][$value])) {
+                            throw new \Exception('Unauthorized request');
+                        } else {
+                            unset($_SESSION['csrf_tokens'][$value]);
+                        }
                     }
+
+                    return false;
                 }
-
-                // Use own csrf token
-                else{
-                    if (!isset($_SESSION['csrf_tokens'][$value])) {
-                        throw new \Exception('Unauthorized request');
-                    }
-                    else{
-                        unset($_SESSION['csrf_tokens'][$value]);
-                    }
-                }
-
-                return false;
-            })
+            )
             ->setMandatory(true);
         $key = 'nonce';
 
@@ -141,15 +145,18 @@ class Form
      * Create nonce
      * @return string
      */
-    private function createNonce(){
-        if(function_exists('wp_create_nonce'))
+    private function createNonce()
+    {
+        if (function_exists('wp_create_nonce')) {
             return wp_create_nonce($this->nonceKey);
+        }
 
         $nonce = md5(microtime(true).$this->nonceKey);
         if (empty($_SESSION['csrf_tokens'])) {
             $_SESSION['csrf_tokens'] = array();
         }
         $_SESSION['csrf_tokens'][$nonce] = true;
+
         return $nonce;
     }
 
@@ -157,59 +164,58 @@ class Form
      * populates form from POST after submission
      */
 
-    public function populateFields(){
-        if(count($this->submittedData)<1) return;
-        array_map(function(FormField &$field){
-            if(isset($this->submittedData[$field->getName()])){
-                $raw = $this->submittedData[$field->getName()];
+    public function populateFields()
+    {
+        if (count($this->submittedData) < 1) {
+            return;
+        }
+        array_map(
+            function (FormField &$field) {
+                if (isset($this->submittedData[$field->getName()])) {
+                    $raw = $this->submittedData[$field->getName()];
 
-                $sanitized = $field->sanitize($raw);
-                $field->setValue($sanitized);
-            }else{
-                // Unset value (see: checkboxes where value only sent when checkbox was checked
-                if($field->getType() == FormField::TYPE_CHECKBOX){
-                    $field->setValue(null);
+                    $sanitized = $field->sanitize($raw);
+                    $field->setValue($sanitized);
+                } else {
+                    // Unset value (see: checkboxes where value only sent when checkbox was checked
+                    if ($field->getType() == FormField::TYPE_CHECKBOX) {
+                        $field->setValue(null);
+                    }
+
                 }
-
-            }
-        },
-        $this->getFields());
+            },
+            $this->getFields()
+        );
     }
 
     /**
      * Validate form input
      * @return mixed
      */
-    public function validate(){
+    public function validate()
+    {
         $errors = [];
-        array_map(function(FormField $field) use (&$errors){
-            if(isset($this->submittedData[$field->getName()])){
-                // is it mandatory and empty?
-                if($field->isMandatory() && strlen($this->submittedData[$field->getName()]) < 1){
-                    $errors[$field->getName()] = [
-                        'field' => $field->getName(),
-                        'error' => "This is mandatory.",
-                    ];
+        array_map(
+            function (FormField $field) use (&$errors) {
+                if (isset($this->submittedData[$field->getName()])) {
+                    // is it mandatory and empty?
+                    if ($field->isMandatory() && strlen($this->submittedData[$field->getName()]) < 1) {
+                        $field->addError("Mandatory");
 
-                    // Go to the next field, no need to validate
-                    return true;
+                        // Go to the next field, no need to validate
+                        return true;
+                    }
+
+                    $validationResult = $field->validate();
+                    if ($validationResult) {
+                        $field->addError($validationResult);
+                    }
+
+                    return false;
                 }
-
-                $validationResult = $field->validate();
-                if($validationResult){
-                    $errors[$field->getName()] =
-                        [
-                            'field' => $field->getName(),
-                            'error' => $validationResult
-                        ];
-                }
-                return false;
-            }
-        },
-        $this->getFields());
-
-        // Write to the template vars
-        $this->addToTemplateVars($errors, 'form_errors');
+            },
+            $this->getFields()
+        );
 
         return $errors;
     }
@@ -226,7 +232,8 @@ class Form
      * Get templateVars
      * @return array
      */
-    public function getTemplateVars(){
+    public function getTemplateVars()
+    {
         return $this->templateVars;
     }
 
@@ -235,7 +242,7 @@ class Form
      * @param array $templateVars
      * @return $this
      */
-    public function setTemplateVars(Array $templateVars)
+    public function setTemplateVars(array $templateVars)
     {
         $this->templateVars = $templateVars;
 
@@ -282,7 +289,8 @@ class Form
      * @param $key
      * @return mixed
      */
-    public function getField($key){
+    public function getField($key)
+    {
         return $this->formFields[$key];
     }
 
@@ -290,18 +298,23 @@ class Form
      * Add fields to the form
      * @param array $fields
      */
-    public function addFields(array $fields){
-        array_walk($fields, function($field, $key){
-            $this->addField($key, $field);
-        });
+    public function addFields(array $fields)
+    {
+        array_walk(
+            $fields,
+            function ($field, $key) {
+                $this->addField($key, $field);
+            }
+        );
     }
 
 
     /**
      * Adds fields to template vars
      */
-    private function addFieldsToTemplateVars(){
-        $this->templateVars['form_fields'] = array_merge($this->formFields, $this->templateVars['form_fields']) ;
+    private function addFieldsToTemplateVars()
+    {
+        $this->templateVars['form_fields'] = array_merge($this->formFields, $this->templateVars['form_fields']);
     }
 
     /**
