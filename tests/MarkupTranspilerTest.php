@@ -174,4 +174,27 @@ EOF;
             $this->assertInstanceOf('Evista\Perform\Exception\FormFieldException', $exception);
         }
     }
+
+    public function getSelectedOption()
+    {
+        $markup = <<<EOF
+        <form method="post" action="/login" id="login-form">
+           <select name="test-select" id="test-id" placeholder="silly-placeholder">
+              <option value="volvo">Volvo</option>
+              <option value="saab" selected>Saab</option>
+              <option value="mercedes">Mercedes</option>
+              <option value="audi">Audi</option>
+            </select>
+        </form>
+EOF;
+        $factory = new Service(new Crawler());
+        $form = $factory->transpileForm($markup);
+
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+
+        $selectField = $form->getField('test-select');
+
+        $selected = $selectField->getSelected();
+
+    }
 }
