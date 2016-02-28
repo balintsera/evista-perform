@@ -14,26 +14,34 @@ use Evista\Perform\Form\Form;
 use Evista\Perform\ValueObject\ExtendedDOMNode;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
+use Evista\Perform\Exception\UploadDirNotExists;
 
 class FormMarkupTranspiler
 {
     const formClassNameAttrName = 'data-class';
-
 
     private $crawler;
     private $markup;
     private $formTag;
     private $formClassName;
     private $fields;
+    private $uploadDir;
 
-    public function __construct(Crawler $crawler, $markup = false)
+    public function __construct(Crawler $crawler, $markup = false, $uploadDir = false)
     {
         $this->crawler = $crawler;
         $this->markup = $markup;
-        if($markup){
+        if ($markup){
             $this->initCrawler();
         }
-
+        if ($uploadDir) {
+          $this->uploadDir = $uploadDir;
+        } else {
+          $this->uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/../var/uploads';
+        }
+        if (!file_exists($this->uploadDir)) {
+          throw new UploadDirNotExists('Upload dir not exists: ' . $this->uploadDir);
+        }
     }
 
     /**
@@ -115,6 +123,10 @@ class FormMarkupTranspiler
                 });
             }
 
+            // handle file uploads
+            if ($type === 'file') {
+
+            }
 
             // Add to all fields
             $this->fields[$field->getName()] = $field;
