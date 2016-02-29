@@ -217,4 +217,29 @@ class UploadedFile
 
         return $this;
     }
+
+    /**
+     * Get the value of User Extension
+     *
+     * @return mixed
+     */
+    public function getUserExtension()
+    {
+        return $this->userExtension;
+    }
+
+    /**
+     * Set the value of User Extension
+     *
+     * @param mixed userExtension
+     *
+     * @return self
+     */
+    public function setUserExtension($userExtension)
+    {
+        $this->userExtension = $userExtension;
+
+        return $this;
+    }
+
 }

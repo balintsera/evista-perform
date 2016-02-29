@@ -52,10 +52,10 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
 
     // Get an input field named 'email'
     $emailField = $form->getField('email');
-    
+
     // Get the field's submitted value
     $emailField->getValue();
-    
+
     // Get attributes, eg. placeholder:
     $placeholder = $emailField->getAttribute('placeholder');
 
@@ -66,6 +66,25 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
     // Get the default selected option (that is selected in markup)
     $defaultSelected = $selectField->getDefaultSelectedOption();
 
+    // Get files and handle them (multiple/single file upload)
+    $fileField = $form->getField('files');
+    $uploadedFiles = $fileField->getFiles();
+    foreach ($uploadedFiles as $uploadedFile) {
+        // Check real file type:
+        $realType = $uploadedFile->getRealType(); // eg. image/png
+
+        $userAddedName = $uploadedFile->getUserName;
+
+        // Move the file to its final destination
+        $uploadedFile->moveToDestination($destination = '/var/uploads/');
+
+        // Get safe file name
+        $safeBaseName = $uploadedFile->getSafeName(); // no extension
+
+        // Get the original extension from filename
+        $userExtension = $uploadedFile->getUserExtension();
+    }
+    
      // Check validity
     if (!$form->isValid()) {
         // All errors can be spotted in the fields
@@ -75,7 +94,7 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
             }
         }
     }
-    
+
     // Then send some response
     $response = new JsonResponse(['dump'=>(var_export($form, true))]);
     return $response;

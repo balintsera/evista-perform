@@ -132,6 +132,7 @@ class FormMarkupTranspiler
               } catch (NoFileUploadedException $noFileEx) {
                   // throw validation error?
               }
+              var_dump($field->getFiles());
             }
 
             // Add to all fields
