@@ -33,4 +33,18 @@ class FormFieldException extends \Exception
 
         return new static($message);
     }
+
+    public static function noSuchFieldName($name)
+    {
+      $message = 'No field named: ' . $name;
+
+      return new static($message);
+    }
+
+    public function notAFileUpload($fieldTagName)
+    {
+      $message = 'This field is not file type (it\'s actually a ' . $fieldTagName . ')';
+
+      return new static($message);
+    }
 }

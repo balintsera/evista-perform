@@ -15,6 +15,8 @@ use Evista\Perform\ValueObject\ExtendedDOMNode;
 use Evista\Perform\ValueObject\FormField;
 use Symfony\Component\DomCrawler\Crawler;
 use Evista\Perform\Exception\UploadDirNotExists;
+use Evista\Perform\Exception\NoFileUploadedException;
+use Evista\Perform\ValueObject\UploadedFile;
 
 class FormMarkupTranspiler
 {
@@ -123,9 +125,13 @@ class FormMarkupTranspiler
                 });
             }
 
-            // handle file uploads
+            // complex form elements: handle file uploads
             if ($type === 'file') {
-
+              try {
+                  $field->compactFiles($_FILES);
+              } catch (NoFileUploadedException $noFileEx) {
+                  // throw validation error?
+              }
             }
 
             // Add to all fields

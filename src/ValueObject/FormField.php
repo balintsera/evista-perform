@@ -10,6 +10,8 @@ namespace Evista\Perform\ValueObject;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Evista\Perform\Exception\FormFieldException;
+use Evista\Perform\ValueObject\UploadedFile;
+use Evista\Perform\Exception\NoFileUploadedException;
 
 class FormField
 {
@@ -37,6 +39,7 @@ class FormField
     private $label; // only checkboxes self::TYPE_CHECKBOX
     private $options = []; // only select self::TYPE_SELECT
     private $errors = [];
+    private $files = []; // only for file types
 
     public function __construct($type)
     {
@@ -405,5 +408,39 @@ class FormField
         }
 
         return false;
+    }
+
+    /**
+     * Compact files from uploaded files array - usually $_FILES
+     * @param  [type] $files [description]
+     * @return [type]        [description]
+     */
+    public function compactFiles(array $files)
+    {
+      if ($this->type !== self::TYPE_FILE) {
+        throw FormFieldException::notAFileUpload($this->tagName);
+      }
+
+      if (empty($files)) {
+        throw new NoFileUploadedException("Files are missing from payload");
+      }
+
+      foreach (UploadedFile::create($this->name, $files) as $uploadedFile) {
+        $this->files[] = $uploadedFile;
+      }
+    }
+
+    /**
+     * add a new uploaded file to the field
+     * @param [type] $file [description]
+     */
+    public function addFile($file)
+    {
+      $this->files[] = $file;
+    }
+
+    public function getFiles()
+    {
+      return $this->files;
     }
 }
