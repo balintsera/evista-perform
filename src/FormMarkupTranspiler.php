@@ -29,7 +29,7 @@ class FormMarkupTranspiler
     private $fields;
     private $uploadDir;
 
-    public function __construct(Crawler $crawler, $markup = false, $uploadDir = false)
+    public function __construct(Crawler $crawler, $markup = false, $uploadDir = './var/uploads')
     {
         $this->crawler = $crawler;
         $this->markup = $markup;
