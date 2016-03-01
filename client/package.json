@@ -9,6 +9,8 @@
   "author": "sera.balint@e-vista.hu",
   "license": "MIT",
   "devDependencies": {
+    "babel-core": "^6.6.0",
+    "babel-loader": "^6.2.4",
     "webpack": "^1.12.14"
   }
 }
