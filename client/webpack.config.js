@@ -5,12 +5,16 @@ module.exports = {
         filename: 'bundle.js',
     },
     module: {
-       loaders: [
-           {
-               test:   /\.js/,
-               loader: 'babel',
-               include: __dirname + '/src',
-           }
-       ],
-   }
+      loaders: [
+        {
+          test: /\.js?$/,
+          exclude: /node_modules/,
+          loaders: ['babel?presets[]=es2015']
+        },
+        {
+          test: /\.json$/,
+          loader: 'json-loader'
+        },
+      ],
+  },
 };

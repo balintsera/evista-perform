@@ -1,5 +1,3 @@
-'use strict';
-
 class AJAXSubmit
 {
 
@@ -120,10 +118,13 @@ class AJAXSubmit
     this.processStatus(oData);
   }
 
-  static submit(oFormElement) {
-    if (!oFormElement.action) { return; }
+  submit(oFormElement) {
+    if (!oFormElement.action) {
+      throw new Error('No action defined for the submitted form');
+    }
+
     this.submitRequest(oFormElement);
   }
 }
 
-module.exports = AJAXSubmit;
+window.AJAXSubmit = new AJAXSubmit();
