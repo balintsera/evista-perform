@@ -57,28 +57,20 @@
 
 	  _createClass(Perform, [{
 	    key: 'ajaxSuccess',
-
-	    /*
-	      -----------------------------15342f08019
-	     Content-Disposition: form-data; name="email"
-	       -----------------------------15342f08019
-	     Content-Disposition: form-data; name="password"
-	       -----------------------------15342f08019
-	     Content-Disposition: form-data; name="test_textarea"
-	       -----------------------------15342f08019
-	     Content-Disposition: form-data; name="test-select"
-	      saab
-	     -----------------------------15342f08019
-	     Content-Disposition: form-data; name="photos[]"
-	       -----------------------------15342f08019--
-	     */
-	    value: function ajaxSuccess() {
+	    value: function ajaxSuccess(requestEvent) {
+	      console.log(requestEvent);
+	      var response = requestEvent.currentTarget.response;
 	      /* console.log("AJAXSubmit - Success!"); */
-	      console.log(this.response);
+	      console.log(response);
 	      /* you can get the serialized data through the "submittedData" custom property: */
 	      /* alert(JSON.stringify(this.submittedData)); */
 	      var dumper = document.getElementById('dumper');
-	      dumper.innerHTML = this.response.dump;
+	      dumper.innerHTML = response.dump;
+	    }
+	  }, {
+	    key: 'ajaxError',
+	    value: function ajaxError(error) {
+	      console.log('submit error', error);
 	    }
 	  }, {
 	    key: 'submitData',
@@ -88,9 +80,7 @@
 	      oAjaxReq.responseType = 'json';
 	      oAjaxReq.submittedData = oData;
 	      oAjaxReq.onload = this.ajaxSuccess;
-	      oAjaxReq.onerror = function (error) {
-	        console.log('error', error);
-	      };
+	      oAjaxReq.onerror = this.ajaxError;
 	      console.log('sending');
 
 	      if (oData.technique === 0) {
@@ -200,11 +190,17 @@
 	    }
 	  }, {
 	    key: 'submit',
-	    value: function submit(oFormElement) {
+	    value: function submit(oFormElement, success, error) {
 	      if (!oFormElement.action) {
 	        throw new Error('No action defined for the submitted form');
 	      }
+	      if (success) {
+	        this.ajaxSuccess = success;
+	      }
 
+	      if (error) {
+	        this.ajaxError = error;
+	      }
 	      this.submitRequest(oFormElement);
 	    }
 	  }]);

@@ -87,7 +87,7 @@ EOF;
             <button value="login" id="login-button">Login</button>
         </form>
 EOF;
-        $factory = new Service(new Crawler());
+        $factory = new Service(new Crawler(), './var/uploads');
         $form = $factory->transpileForm($markup);
 
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
@@ -104,7 +104,7 @@ EOF;
             <input type="email" name="email" placeholder="Your email" value="" pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$">
           </form>
 EOF;
-        $factory = new Service(new Crawler());
+        $factory = new Service(new Crawler(), './var/uploads');
         // Faking post
         $_POST['email'] = 'balint.sera@gmail.com';
         /** @var Form $form */
@@ -128,7 +128,7 @@ EOF;
             </select>
         </form>
 EOF;
-        $factory = new Service(new Crawler());
+        $factory = new Service(new Crawler(), './var/uploads');
         $form = $factory->transpileForm($markup);
 
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
@@ -159,7 +159,7 @@ EOF;
             </select>
         </form>
 EOF;
-        $factory = new Service(new Crawler());
+        $factory = new Service(new Crawler(), './var/uploads');
         $form = $factory->transpileForm($markup);
 
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
@@ -187,7 +187,7 @@ EOF;
             </select>
         </form>
 EOF;
-        $factory = new Service(new Crawler());
+        $factory = new Service(new Crawler(), './var/uploads');
         $form = $factory->transpileForm($markup);
 
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
@@ -221,7 +221,7 @@ EOF;
             <button value="login" id="login-button">Login</button>
         </form>
 EOF;
-        $factory = new Service(new Crawler());
+        $factory = new Service(new Crawler(), './var/uploads');
         $form = $factory->transpileForm($markup);
 
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);

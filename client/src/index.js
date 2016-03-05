@@ -1,36 +1,18 @@
 class Perform
 {
-  /*
-
-   -----------------------------15342f08019
-   Content-Disposition: form-data; name="email"
-
-
-   -----------------------------15342f08019
-   Content-Disposition: form-data; name="password"
-
-
-   -----------------------------15342f08019
-   Content-Disposition: form-data; name="test_textarea"
-
-
-   -----------------------------15342f08019
-   Content-Disposition: form-data; name="test-select"
-
-   saab
-   -----------------------------15342f08019
-   Content-Disposition: form-data; name="photos[]"
-
-
-   -----------------------------15342f08019--
-   */
-  ajaxSuccess() {
+  ajaxSuccess(requestEvent) {
+    console.log(requestEvent);
+    const response = requestEvent.currentTarget.response;
     /* console.log("AJAXSubmit - Success!"); */
-    console.log(this.response);
+    console.log(response);
     /* you can get the serialized data through the "submittedData" custom property: */
     /* alert(JSON.stringify(this.submittedData)); */
     const dumper = document.getElementById('dumper');
-    dumper.innerHTML = this.response.dump;
+    dumper.innerHTML = response.dump;
+  }
+
+  ajaxError(error) {
+    console.log('submit error', error);
   }
 
   submitData(oData) {
@@ -39,9 +21,7 @@ class Perform
     oAjaxReq.responseType = 'json';
     oAjaxReq.submittedData = oData;
     oAjaxReq.onload = this.ajaxSuccess;
-    oAjaxReq.onerror = function(error) {
-      console.log('error', error);
-    };
+    oAjaxReq.onerror = this.ajaxError;
     console.log('sending');
 
     if (oData.technique === 0) {
@@ -140,11 +120,17 @@ class Perform
     this.processStatus(oData);
   }
 
-  submit(oFormElement) {
+  submit(oFormElement, success, error) {
     if (!oFormElement.action) {
       throw new Error('No action defined for the submitted form');
     }
+    if (success) {
+      this.ajaxSuccess = success;
+    }
 
+    if (error) {
+      this.ajaxError = error;
+    }
     this.submitRequest(oFormElement);
   }
 }
