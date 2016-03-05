@@ -18,12 +18,12 @@ class TranspiledForm
     private $transpiler;
     private $form;
 
-    public function __construct($markup, $crawler, $transpiler = false)
+    public function __construct($markup, $crawler, $transpiler = false, $uploadDir = false)
     {
         $this->markup = $markup;
 
         if(!$transpiler){
-            $this->transpiler =  new FormMarkupTranspiler($crawler, $this->markup);
+            $this->transpiler =  new FormMarkupTranspiler($crawler, $this->markup, $uploadDir);
         }
         else{
             $this->transpiler = $transpiler;

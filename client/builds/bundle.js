@@ -50,13 +50,28 @@
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-	var AJAXSubmit = function () {
-	  function AJAXSubmit() {
-	    _classCallCheck(this, AJAXSubmit);
+	var Perform = function () {
+	  function Perform() {
+	    _classCallCheck(this, Perform);
 	  }
 
-	  _createClass(AJAXSubmit, [{
+	  _createClass(Perform, [{
 	    key: 'ajaxSuccess',
+
+	    /*
+	      -----------------------------15342f08019
+	     Content-Disposition: form-data; name="email"
+	       -----------------------------15342f08019
+	     Content-Disposition: form-data; name="password"
+	       -----------------------------15342f08019
+	     Content-Disposition: form-data; name="test_textarea"
+	       -----------------------------15342f08019
+	     Content-Disposition: form-data; name="test-select"
+	      saab
+	     -----------------------------15342f08019
+	     Content-Disposition: form-data; name="photos[]"
+	       -----------------------------15342f08019--
+	     */
 	    value: function ajaxSuccess() {
 	      /* console.log("AJAXSubmit - Success!"); */
 	      console.log(this.response);
@@ -85,7 +100,7 @@
 	      } else {
 	        /* method is POST */
 	        oAjaxReq.open('post', oData.receiver, true);
-	        console.log(oData.segments);
+	        console.log('post data', oData);
 	        if (oData.technique === 3) {
 	          /* enctype is multipart/form-data */
 	          var sBoundary = '---------------------------' + Date.now().toString(16);
@@ -110,13 +125,6 @@
 	      this.submitData(oData);
 	    }
 	  }, {
-	    key: 'pushSegment',
-	    value: function pushSegment(oFREvt) {
-	      this.owner.segments[this.segmentIdx] += oFREvt.target.result + '\r\n';
-	      this.owner.status--;
-	      this.processStatus(this.owner);
-	    }
-	  }, {
 	    key: 'plainEscape',
 	    value: function plainEscape(sText) {
 	      /* how should I treat a text/plain form encoding? what characters are not allowed? this is what I suppose...: */
@@ -126,6 +134,8 @@
 	  }, {
 	    key: 'submitRequest',
 	    value: function submitRequest(oTarget) {
+	      var _this = this;
+
 	      var sFieldType = false;
 	      var oField = false;
 	      var bIsPost = oTarget.method.toLowerCase() === 'post';
@@ -133,7 +143,6 @@
 	      var oData = {};
 	      oData.contentType = bIsPost && oTarget.enctype ? oTarget.enctype : 'application\/x-www-form-urlencoded';
 	      oData.technique = bIsPost ? oData.contentType === 'multipart\/form-data' ? 3 : oData.contentType === 'text\/plain' ? 2 : 1 : 0;
-	      console.log(oData.technique);
 	      oData.receiver = oTarget.action;
 	      oData.status = 0;
 	      oData.segments = [];
@@ -146,18 +155,28 @@
 	        sFieldType = oField.nodeName.toUpperCase() === 'INPUT' ? oField.getAttribute('type').toUpperCase() : 'TEXT';
 	        if (sFieldType === 'FILE' && oField.files.length > 0) {
 	          if (oData.technique === 3) {
-	            /* enctype is multipart/form-data */
-	            for (var nFile = 0; nFile < oField.files.length; nFile++) {
+	            var _loop = function _loop(nFile) {
 	              var oFile = oField.files[nFile];
 	              var oSegmReq = new FileReader();
+	              var _self = _this;
 	              /* (custom properties:) */
 	              oSegmReq.segmentIdx = oData.segments.length;
 	              oSegmReq.owner = oData;
 	              /* (end of custom properties) */
-	              oSegmReq.onload = this.pushSegment;
+
+	              oSegmReq.onload = function (oFREvt) {
+	                this.owner.segments[this.segmentIdx] += oFREvt.target.result + '\r\n';
+	                this.owner.status--;
+	                _self.processStatus(this.owner);
+	              };
 	              oData.segments.push('Content-Disposition: form-data; name="' + oField.name + "\"; filename=\"" + oFile.name + '"\r\nContent-Type: ' + oFile.type + '\r\n\r\n');
 	              oData.status++;
 	              oSegmReq.readAsBinaryString(oFile);
+	            };
+
+	            /* enctype is multipart/form-data */
+	            for (var nFile = 0; nFile < oField.files.length; nFile++) {
+	              _loop(nFile);
 	            }
 	          } else {
 	            /* enctype is application/x-www-form-urlencoded or text/plain or method is GET: files will not be sent! */
@@ -165,14 +184,14 @@
 	          }
 	        } else if (sFieldType !== 'RADIO' && sFieldType !== 'CHECKBOX' || oField.checked) {
 	          /* field type is not FILE or is FILE but is empty */
-	          oData.segments.push(this.technique === 3 ? /* enctype is multipart/form-data */
+	          oData.segments.push(oData.technique === 3 ? /* enctype is multipart/form-data */
 	          'Content-Disposition: form-data; name="' + oField.name + '"\r\n\r\n' + oField.value + '\r\n' : /* enctype is application/x-www-form-urlencoded or text/plain or method is GET */
 	          fFilter(oField.name) + '=' + fFilter(oField.value));
 	        }
 	      }
 
 	      // add form markup to perform parameter
-	      if (this.technique === 3) {
+	      if (oData.technique === 3) {
 	        oData.segments.push('Content-Disposition: form-data; name="' + 'serform' + '"\r\n\r\n' + oTarget.outerHTML + '\r\n');
 	      } else {
 	        oData.segments.push('serform' + '=' + encodeURIComponent(oTarget.outerHTML));
@@ -190,10 +209,10 @@
 	    }
 	  }]);
 
-	  return AJAXSubmit;
+	  return Perform;
 	}();
 
-	window.AJAXSubmit = new AJAXSubmit();
+	window.Perform = new Perform();
 
 /***/ }
 /******/ ]);

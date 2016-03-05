@@ -13,10 +13,12 @@ use Evista\Perform\Form\TranspiledForm;
 class Service
 {
     private $crawler;
+    private $uploadDir;
 
-    public function __construct($crawler)
+    public function __construct($crawler, $uploadDir = false)
     {
         $this->crawler = $crawler;
+        $this->uploadDir = $uploadDir;
     }
 
 
@@ -27,7 +29,7 @@ class Service
      */
     public function transpileForm($markup)
     {
-        $transpiledForm = new TranspiledForm($markup, $this->crawler);
+        $transpiledForm = new TranspiledForm($markup, $this->crawler, false, $this->uploadDir);
 
         // Return the result form object
         return $transpiledForm->getForm();
