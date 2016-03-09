@@ -68,7 +68,7 @@ class FormField
                 break;
         }
 
-        $this->options = new [];
+        $this->options = [];
     }
 
     /**
