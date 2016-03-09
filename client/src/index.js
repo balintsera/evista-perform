@@ -1,13 +1,11 @@
 class Perform
 {
-  ajaxSuccess(requestEvent) {
-    console.log(requestEvent);
-    const response = requestEvent.currentTarget.response;
-    /* console.log("AJAXSubmit - Success!"); */
-    console.log(response);
-    /* you can get the serialized data through the "submittedData" custom property: */
-    /* alert(JSON.stringify(this.submittedData)); */
-    const dumper = document.getelentById('dumper');
+  ajaxSuccess(result) {
+    console.log('ajax success result', result);
+    const response = JSON.parse(result.target.response);
+    console.log('response', response);
+
+    let dumper = document.getElementById('dumper');
     dumper.innerHTML = response.dump;
   }
 
@@ -15,7 +13,15 @@ class Perform
     console.log('submit error', error);
   }
 
-  submit(el) {
+  submit(el, success_cb, error_cb) {
+    if (success_cb) {
+      this.ajaxSuccess = success_cb;
+    }
+
+    if (error_cb) {
+      this.ajaxError = error_cb;
+    }
+
     console.log(el);
     const formMarkupInput = document.createElement('input');
     formMarkupInput.type = "hidden";

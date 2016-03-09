@@ -57,14 +57,12 @@
 
 	  _createClass(Perform, [{
 	    key: 'ajaxSuccess',
-	    value: function ajaxSuccess(requestEvent) {
-	      console.log(requestEvent);
-	      var response = requestEvent.currentTarget.response;
-	      /* console.log("AJAXSubmit - Success!"); */
-	      console.log(response);
-	      /* you can get the serialized data through the "submittedData" custom property: */
-	      /* alert(JSON.stringify(this.submittedData)); */
-	      var dumper = document.getelentById('dumper');
+	    value: function ajaxSuccess(result) {
+	      console.log('ajax success result', result);
+	      var response = JSON.parse(result.target.response);
+	      console.log('response', response);
+
+	      var dumper = document.getElementById('dumper');
 	      dumper.innerHTML = response.dump;
 	    }
 	  }, {
@@ -74,7 +72,15 @@
 	    }
 	  }, {
 	    key: 'submit',
-	    value: function submit(el) {
+	    value: function submit(el, success_cb, error_cb) {
+	      if (success_cb) {
+	        this.ajaxSuccess = success_cb;
+	      }
+
+	      if (error_cb) {
+	        this.ajaxError = error_cb;
+	      }
+
 	      console.log(el);
 	      var formMarkupInput = document.createElement('input');
 	      formMarkupInput.type = "hidden";
