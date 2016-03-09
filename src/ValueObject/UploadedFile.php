@@ -67,8 +67,12 @@ class UploadedFile
      */
     public function moveToDestination($destination)
     {
+        $fileName = $this->getSafeName();
+        if(strpos($this->getRealType(), $this->getUserExtension) == 0)
+          $fileName = $this->getSafeName().'.'.$this->getUserExtension();
+
         try {
-            move_uploaded_file($this->tmpName, $destination);
+            move_uploaded_file($this->tmpName, $destination.'/'.$fileName);
         } catch (\Exception $exception) {
             throw new CantMoveToDestination("Error Processing Request", 1);
         }
