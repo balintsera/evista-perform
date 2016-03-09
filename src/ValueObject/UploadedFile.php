@@ -62,7 +62,8 @@ class UploadedFile
     /**
      * Move file to destination
      * @param  [type] $destination [description]
-     * @return [type]              [description]
+     * @return $this [type]              [description]
+     * @throws CantMoveToDestination
      */
     public function moveToDestination($destination)
     {
@@ -242,4 +243,41 @@ class UploadedFile
         return $this;
     }
 
+    /**
+     * @return bool|string
+     */
+    public function getSafeName()
+    {
+        return $this->safeName;
+    }
+
+    /**
+     * @param bool|string $safeName
+     * @return UploadedFile
+     */
+    public function setSafeName($safeName)
+    {
+        $this->safeName = $safeName;
+
+        return $this;
+    }
+
+    /**
+     * @return boolean
+     */
+    public function getRealType()
+    {
+        return $this->realType;
+    }
+
+    /**
+     * @param boolean $realType
+     * @return UploadedFile
+     */
+    public function setRealType($realType)
+    {
+        $this->realType = $realType;
+
+        return $this;
+    }
 }

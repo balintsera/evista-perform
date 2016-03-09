@@ -22,10 +22,9 @@ class TranspiledForm
     {
         $this->markup = $markup;
 
-        if(!$transpiler){
-            $this->transpiler =  new FormMarkupTranspiler($crawler, $this->markup, $uploadDir);
-        }
-        else{
+        if (!$transpiler) {
+            $this->transpiler = new FormMarkupTranspiler($crawler, $this->markup, $uploadDir);
+        } else {
             $this->transpiler = $transpiler;
         }
 
@@ -36,7 +35,8 @@ class TranspiledForm
      * Convert a markup to a BaseForm objet
      * @return mixed
      */
-    public function transpile(){
+    public function transpile()
+    {
         // Form
         /** @var Form form */
         $this->form = $this->transpiler->instantiateFormObject();
@@ -57,7 +57,8 @@ class TranspiledForm
      * Get transpiled form
      * @return mixed
      */
-    public function getForm(){
+    public function getForm()
+    {
         return $this->form;
     }
 

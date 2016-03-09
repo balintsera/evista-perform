@@ -33,16 +33,16 @@ class FormMarkupTranspiler
     {
         $this->crawler = $crawler;
         $this->markup = $markup;
-        if ($markup){
+        if ($markup) {
             $this->initCrawler();
         }
         if ($uploadDir) {
-          $this->uploadDir = $uploadDir;
+            $this->uploadDir = $uploadDir;
         } else {
-          $this->uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/../var/uploads';
+            $this->uploadDir = $_SERVER['DOCUMENT_ROOT'].'/../var/uploads';
         }
         if (!file_exists($this->uploadDir)) {
-          throw new UploadDirNotExists('Upload dir not exists: ' . $this->uploadDir);
+            throw new UploadDirNotExists('Upload dir not exists: '.$this->uploadDir);
         }
     }
 
@@ -50,11 +50,15 @@ class FormMarkupTranspiler
      * find a form tag
      * @return mixed
      */
-    public function findFormTag(){
+    public function findFormTag()
+    {
         // Caching is important: if it's not crawled already, crawl it
-        $this->runIfNotCached('formTag', function(){
-            return $this->crawler->filter('form');
-        });
+        $this->runIfNotCached(
+            'formTag',
+            function () {
+                return $this->crawler->filter('form');
+            }
+        );
 
         return $this->formTag;
     }
@@ -63,18 +67,23 @@ class FormMarkupTranspiler
     /**
      * Get class-name for the form
      */
-    public function findFormClassName(){
-        $this->runIfNotCached('formClassName', function(){
-            return $this->findFormTag()->attr(self::formClassNameAttrName);
-        });
+    public function findFormClassName()
+    {
+        $this->runIfNotCached(
+            'formClassName',
+            function () {
+                return $this->findFormTag()->attr(self::formClassNameAttrName);
+            }
+        );
 
         return $this->formClassName;
     }
 
-    public function instantiateFormObject(){
-        try{
+    public function instantiateFormObject()
+    {
+        try {
             $form = new Form();
-        }catch (\Exception $exception){
+        } catch (\Exception $exception) {
             // Now what? This is a problem
             throw new ClassInstantiationFailed('Class instantiation failed');
         }
@@ -85,10 +94,14 @@ class FormMarkupTranspiler
     /**
      * @return array
      */
-    public function findFields(){
-        $this->runIfNotCached('fields', function(){
-            $this->transpileFields();
-        });
+    public function findFields()
+    {
+        $this->runIfNotCached(
+            'fields',
+            function () {
+                $this->transpileFields();
+            }
+        );
 
         return $this->fields;
     }
@@ -96,49 +109,52 @@ class FormMarkupTranspiler
     /**
      * Find fields in markup
      */
-    private function transpileFields(){
+    private function transpileFields()
+    {
         $formElements = 'input, select, textarea, button';
 
-        $this->findFormTag()->filter($formElements)->each(function (Crawler $node, $i){
+        $this->findFormTag()->filter($formElements)->each(
+            function (Crawler $node, $i) {
 
-            // If it has a type attr, use as type
-            if(null !== $node->attr('type')){
-                $type = $node->attr('type');
+                // If it has a type attr, use as type
+                if (null !== $node->attr('type')) {
+                    $type = $node->attr('type');
+                } else {
+                    $type = $node->nodeName();
+                }
+
+
+                // Create a FormField and get default attributes (name, value, validation, required)
+                $field = $this->fieldFactory($type, $node);
+
+
+                // complex form elements 1: select -> options
+                if ($type === 'select') {
+                    $options = $node->filter('option');
+
+                    // FormField
+                    $options->each(
+                        function ($option) use ($field) {
+                            $optionField = $this->fieldFactory('option', $option);
+                            $field->addOption($optionField);
+                        }
+                    );
+                }
+
+                // complex form elements: handle file uploads
+                if ($type === 'file') {
+                    try {
+                        $field->compactFiles($_FILES);
+                    } catch (NoFileUploadedException $noFileEx) {
+                        // throw validation error?
+                    }
+                }
+
+                // Add to all fields
+                $this->fields[$field->getName()] = $field;
+
             }
-            else{
-                $type = $node->nodeName();
-            }
-
-
-            // Create a FormField and get default attributes (name, value, validation, required)
-            $field = $this->fieldFactory($type, $node);
-
-
-            // complex form elements 1: select -> options
-            if ($type === 'select') {
-                $options = $node->filter('option');
-
-                // FormField
-                $options->each(function ($option) use ($field) {
-                    $optionField = $this->fieldFactory('option', $option);
-                    $field->addOption($optionField);
-                });
-            }
-
-            // complex form elements: handle file uploads
-            if ($type === 'file') {
-              try {
-                  $field->compactFiles($_FILES);
-              } catch (NoFileUploadedException $noFileEx) {
-                  // throw validation error?
-              }
-              var_dump($field->getFiles());
-            }
-
-            // Add to all fields
-            $this->fields[$field->getName()] = $field;
-
-        });;
+        );
 
         return $this->fields;
     }
@@ -158,14 +174,17 @@ class FormMarkupTranspiler
         $field->setAttributes($attributes);
 
         // Pattern validation callback
-        if(array_key_exists('pattern', $attributes)){
+        if (array_key_exists('pattern', $attributes)) {
             $pattern = $attributes['pattern'];
-            $field->setValidationCallback(function($value) use ($pattern){
-                if(preg_match('/'.$pattern.'/', $value)){
-                    return false; // it's valid!
+            $field->setValidationCallback(
+                function ($value) use ($pattern) {
+                    if (preg_match('/'.$pattern.'/', $value)) {
+                        return false; // it's valid!
+                    }
+
+                    return true;
                 }
-                return true;
-            });
+            );
         }
 
         // Add value
@@ -174,7 +193,9 @@ class FormMarkupTranspiler
             ->setName(str_replace('\"', '', $node->attr('name')));
 
         // Set madatory if required
-        if(array_key_exists('required', $attributes)) $field->setMandatory(true);
+        if (array_key_exists('required', $attributes)) {
+            $field->setMandatory(true);
+        }
 
         return $field;
     }
@@ -190,25 +211,28 @@ class FormMarkupTranspiler
      * @return array
      * @throws \Exception
      */
-    public function transpileAttributes(\DOMNode $node, $ignoreList = []){
+    public function transpileAttributes(\DOMNode $node, $ignoreList = [])
+    {
         $transpiled = [];
 
         $attributes = $node->attributes;
 
-        foreach($attributes as $attribute){
+        foreach ($attributes as $attribute) {
             // Jump to next if it's on the ignore list
-            if(in_array($attribute->nodeName, $ignoreList)){
+            if (in_array($attribute->nodeName, $ignoreList)) {
                 continue;
             };
             $transpiled[$attribute->nodeName] = $attribute->nodeValue;
         }
+
         return $transpiled;
     }
 
     /**
      * Init crawler
      */
-    private function initCrawler(){
+    private function initCrawler()
+    {
         $this->crawler->addContent($this->markup);
     }
 
@@ -217,10 +241,11 @@ class FormMarkupTranspiler
      * @param $variableName
      * @param callable $function
      */
-    private function runIfNotCached($variableName, callable $function){
-        if(null === $this->{$variableName}){
+    private function runIfNotCached($variableName, callable $function)
+    {
+        if (null === $this->{$variableName}) {
             // Only assign that don't returns
-            if(null !== $result = $function()){
+            if (null !== $result = $function()) {
                 $this->{$variableName} = $result;
             }
 
