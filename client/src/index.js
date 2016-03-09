@@ -1,9 +1,9 @@
 class Perform
 {
   ajaxSuccess(result) {
-    console.log('ajax success result', result);
+    //console.log('ajax success result', result);
     const response = JSON.parse(result.target.response);
-    console.log('response', response);
+    //console.log('response', response);
 
     let dumper = document.getElementById('dumper');
     dumper.innerHTML = response.dump;
@@ -22,26 +22,23 @@ class Perform
       this.ajaxError = error_cb;
     }
 
-    console.log(el);
-    const formMarkupInput = document.createElement('input');
-    formMarkupInput.type = "hidden";
-    formMarkupInput.name = "serform";
-    formMarkupInput.value = encodeURIComponent(el.outerHTML);
-    formMarkupInput.id = "serform";
-
-    console.log(formMarkupInput);
-
     // check if its appended already and remove it
     const oldInput = document.getElementById('serform');
     if (oldInput !== null) {
       oldInput.parentNode.removeChild(oldInput);
     }
 
+    const formMarkupInput = document.createElement('input');
+    formMarkupInput.type = "hidden";
+    formMarkupInput.name = "serform";
+    formMarkupInput.value = encodeURIComponent(el.outerHTML);
+    formMarkupInput.id = "serform";
+
     // Add input with markup to the form
     el.appendChild(formMarkupInput)
 
     var formData = new FormData(el);
-    console.log(formData);
+
     const xhr = new XMLHttpRequest();
 
     // Add any event handlers here...

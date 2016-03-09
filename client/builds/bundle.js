@@ -58,9 +58,9 @@
 	  _createClass(Perform, [{
 	    key: 'ajaxSuccess',
 	    value: function ajaxSuccess(result) {
-	      console.log('ajax success result', result);
+	      //console.log('ajax success result', result);
 	      var response = JSON.parse(result.target.response);
-	      console.log('response', response);
+	      //console.log('response', response);
 
 	      var dumper = document.getElementById('dumper');
 	      dumper.innerHTML = response.dump;
@@ -81,26 +81,23 @@
 	        this.ajaxError = error_cb;
 	      }
 
-	      console.log(el);
-	      var formMarkupInput = document.createElement('input');
-	      formMarkupInput.type = "hidden";
-	      formMarkupInput.name = "serform";
-	      formMarkupInput.value = encodeURIComponent(el.outerHTML);
-	      formMarkupInput.id = "serform";
-
-	      console.log(formMarkupInput);
-
 	      // check if its appended already and remove it
 	      var oldInput = document.getElementById('serform');
 	      if (oldInput !== null) {
 	        oldInput.parentNode.removeChild(oldInput);
 	      }
 
+	      var formMarkupInput = document.createElement('input');
+	      formMarkupInput.type = "hidden";
+	      formMarkupInput.name = "serform";
+	      formMarkupInput.value = encodeURIComponent(el.outerHTML);
+	      formMarkupInput.id = "serform";
+
 	      // Add input with markup to the form
 	      el.appendChild(formMarkupInput);
 
 	      var formData = new FormData(el);
-	      console.log(formData);
+
 	      var xhr = new XMLHttpRequest();
 
 	      // Add any event handlers here...
