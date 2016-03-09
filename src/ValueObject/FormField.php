@@ -404,10 +404,10 @@ class FormField
     public function isValid()
     {
         if (count($this->errors) > 0) {
-            return true;
+            return false;
         }
 
-        return false;
+        return true;
     }
 
     /**
