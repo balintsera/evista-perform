@@ -42,7 +42,13 @@ class TranspiledForm
         $this->form = $this->transpiler->instantiateFormObject();
 
         // Fields
-        $this->form->addFields($this->transpiler->findFields());
+        $fields = $this->transpiler->findFields();
+        if (!is_array($fields)) {
+          throw new \Exception("No fields found");
+        }
+
+
+        $this->form->addFields($fields);
 
         // Populate
         $this->form->populateFields();
