@@ -2,7 +2,6 @@
 
 namespace Evista\Perform\Form;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Evista\Perform\ValueObject\FormField;
 
 /**
@@ -26,7 +25,7 @@ class Form
 
     public function __construct()
     {
-        $this->formErrors = new ArrayCollection();
+        $this->formErrors = [];
 
 
         // Important: add csrf token to every form

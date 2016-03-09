@@ -8,7 +8,7 @@
 
 namespace Evista\Perform\ValueObject;
 
-use Doctrine\Common\Collections\ArrayCollection;
+
 use Evista\Perform\Exception\FormFieldException;
 use Evista\Perform\ValueObject\UploadedFile;
 use Evista\Perform\Exception\NoFileUploadedException;
@@ -68,7 +68,7 @@ class FormField
                 break;
         }
 
-        $this->options = new ArrayCollection();
+        $this->options = new [];
     }
 
     /**

@@ -123,7 +123,8 @@ class FormMarkupTranspiler
                     $type = $node->nodeName();
                 }
 
-
+                // Node name cames back with apostrophs on some servers
+                $type = str_replace('\"', '', $type);
                 // Create a FormField and get default attributes (name, value, validation, required)
                 $field = $this->fieldFactory($type, $node);
 
