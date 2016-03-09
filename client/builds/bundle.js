@@ -99,9 +99,12 @@
 	      var formData = new FormData(el);
 
 	      var xhr = new XMLHttpRequest();
-
+	      var url = el.action;
+	      if (url === null) {
+	        throw new Error('No url set in the form action attribute');
+	      }
 	      // Add any event handlers here...
-	      xhr.open('POST', '/multiple-file-uploads', true);
+	      xhr.open('POST', url, true);
 
 	      xhr.addEventListener("load", this.ajaxSuccess);
 	      xhr.addEventListener("error", this.ajaxError);

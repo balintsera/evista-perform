@@ -84,7 +84,7 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
         // Get the original extension from filename
         $userExtension = $uploadedFile->getUserExtension();
     }
-    
+
      // Check validity
     if (!$form->isValid()) {
         // All errors can be spotted in the fields
@@ -114,30 +114,65 @@ The markup arrives with the submitted datas in the 'serform' post parameter. For
 
 
 ```html
-<form method="post" action="/login" id="login-form">
-    <input type="email" name="email" placeholder="Your email" value="" pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$">
-    <input type="password" name="password" value="">
-    <button value="login" id="login-button">Login</button>
+<script src="/assets/bundle.js"></script>
+
+<form method="post" action="/multiple-file-uploads" id="login-form">
+    <p>
+        <label for="email-1">Email: </label>
+        <input type="email" name="email" placeholder="Your email" value="" pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$" id="email-1">
+    </p>
+        <label for="passwd-1">Pass: </label>
+        <input type="password" name="password" value="" id="passwd-1">
+    </p>
+    <p>
+        <label for="desc-1">Longer description: </label>
+    </p>
+    <p>
+        <textarea name="test_textarea" id="desc-1"></textarea>
+    </p>
+    <p>
+        <select name="test-select">
+            <option value="volvo">Volvo</option>
+            <option value="saab" selected>Saab</option>
+            <option value="mercedes">Mercedes</option>
+            <option value="audi">Audi</option>
+        </select>
+    </p>
+    <p>
+        <input type="file" multiple name="files[]">
+    </p>
+    <p>
+        <input type="submit" value="Submit" class="btn btn-primary">
+    </p>
 </form>
 
+<script>
+  (function() {
+    var form = document.getElementById('login-form');
+    form.onsubmit = function() {
+
+      // Three params: DOM, success callback and error callback:
+      Perform.submit(
+        form,
+        function success(result) {
+          console.log('mysuccess', result);
+          var response = JSON.parse(result.target.response);
+          var dumper = document.getElementById('dumper');
+          dumper.innerHTML = response.dump;
+        },
+        function error(error) {
+          console.log('myError', error);
+        }
+      );
+
+      return false;
+    };
+  })();
+</script>
+
 ```
 
-There's nothing special in it, exept maybe the HTML5 validations that are attached to the inputs with the pattern attribute. The only tricky moment is the sending of the form's markup in the `serform` parameter via javascipt to enable server side processing.
-
-
-```javascript
-var form = document.getElementById('login-form');
-var el = document.getElementById('login-button');
-el.addEventListener('click', function (event) {
-     console.log('click');
-     event.preventDefault();
-     var data = form.serialize();
-     data += '&serform='+encodeURIComponent(form.outerHTML);
-     console.log(data);
-     post('/loginform', data, function(response){
-       // do something with the response
-       // (...)
-```
+There's a javascript file in `assets/bundle.js` that sends the form's data via POST to the form's destination (action parameter) via a global object called Perform.  
 
 
 
