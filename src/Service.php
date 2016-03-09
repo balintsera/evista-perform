@@ -17,6 +17,7 @@ class Service
 
     public function __construct($crawler, $uploadDir = false)
     {
+        require_once __DIR__.'/../vendor/autoload.php';
         $this->crawler = $crawler;
         $this->uploadDir = $uploadDir;
     }
