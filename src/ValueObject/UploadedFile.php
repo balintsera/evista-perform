@@ -25,7 +25,7 @@ class UploadedFile
 
     public function __construct($name, $index, array $_files)
     {
-        if (null === $_files[$name]['name'][$index]) {
+        if (! $_files[$name]['name'][$index]) {
             throw new NoFileUploadedException('Emtpy file');
         }
         $this->userFileName = $_files[$name]['name'][$index];
@@ -40,6 +40,9 @@ class UploadedFile
 
     public static function create($fieldName, $_files)
     {
+        if (count($_files) < 1) {
+            throw new NoFileUploadedException('Emtpy file');
+        }
         // $fieldName includes a '[]' when the upload is multiple
         $fieldName = str_replace(['[', ']'], '', $fieldName);
 
@@ -68,8 +71,9 @@ class UploadedFile
     public function moveToDestination($destination)
     {
         $fileName = $this->getSafeName();
-        if(strpos($this->getRealType(), $this->getUserExtension) == 0)
-          $fileName = $this->getSafeName().'.'.$this->getUserExtension();
+        if (strpos($this->getRealType(), $this->getUserExtension) == 0) {
+            $fileName = $this->getSafeName().'.'.$this->getUserExtension();
+        }
 
         try {
             move_uploaded_file($this->tmpName, $destination.'/'.$fileName);
