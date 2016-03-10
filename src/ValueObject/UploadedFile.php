@@ -82,9 +82,10 @@ class UploadedFile
         if (strpos($this->getRealType(), $this->getUserExtension) == 0) {
             $fileName = $this->getSafeName() . '.' . $this->getUserExtension();
         }
-
+        ob_start();
+        
         try {
-            move_uploaded_file($this->tmpName, $destination . '/' . $fileName);
+            rename($this->tmpName, $destination . '/' . $fileName);
         } catch (\Exception $exception) {
             throw new CantMoveToDestination("Error Processing Request", 1);
         }
@@ -104,7 +105,8 @@ class UploadedFile
         $destination = $this->uploadDir;
         move_uploaded_file($this->tmpName, $destination.'/'.$fileName);
         $this->realType = $finfo->file($destination.'/'.$fileName, FILEINFO_MIME_TYPE);
-        unlink($destination.'/'.$fileName);
+        $this->tmpName = $destination.'/'.$fileName;
+
 
         return $this;
     }

@@ -145,7 +145,7 @@ class FormMarkupTranspiler
                 // complex form elements: handle file uploads
                 if ($type === 'file') {
                     try {
-                        $field->compactFiles($_FILES);
+                        $field->compactFiles($_FILES, $this->uploadDir);
                     } catch (NoFileUploadedException $noFileEx) {
                         // throw validation error?
                     }
