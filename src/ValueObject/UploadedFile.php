@@ -21,13 +21,16 @@ class UploadedFile
     private $size = false;
     private $realType = false;
     private $userExtension = false;
+    private $uploadDir = '';
 
 
-    public function __construct($name, $index, array $_files)
+    public function __construct($name, $index, array $_files, $uploadDir)
     {
         if (! $_files[$name]['name'][$index]) {
             throw new NoFileUploadedException('Emtpy file');
         }
+
+        $this->uploadDir = $uploadDir;
         $this->userFileName = $_files[$name]['name'][$index];
         $this->safeName = md5($this->userFileName + microtime(true));
         $this->type = $_files[$name]['type'][$index];
@@ -38,8 +41,9 @@ class UploadedFile
         $this->userExtension = $this->pathInfo['extension'];
     }
 
-    public static function create($fieldName, $_files)
+    public static function create($fieldName, $_files, $uploadDir)
     {
+
         if (count($_files) < 1) {
             throw new NoFileUploadedException('Emtpy file');
         }
@@ -58,7 +62,7 @@ class UploadedFile
         $uploadedCount = count($requestedFileField['name']);
 
         for ($index = 0; $index <= $uploadedCount - 1; $index++) {
-            yield new self($fieldName, $index, $_files);
+            yield new self($fieldName, $index, $_files, $uploadDir);
         }
     }
 
@@ -68,15 +72,19 @@ class UploadedFile
      * @return $this [type]              [description]
      * @throws CantMoveToDestination
      */
-    public function moveToDestination($destination)
+    public function moveToDestination($destination = false)
     {
+        if (! $destination) {
+          $destination = $this->uploadDir;
+        }
+
         $fileName = $this->getSafeName();
         if (strpos($this->getRealType(), $this->getUserExtension) == 0) {
-            $fileName = $this->getSafeName().'.'.$this->getUserExtension();
+            $fileName = $this->getSafeName() . '.' . $this->getUserExtension();
         }
 
         try {
-            move_uploaded_file($this->tmpName, $destination.'/'.$fileName);
+            move_uploaded_file($this->tmpName, $destination . '/' . $fileName);
         } catch (\Exception $exception) {
             throw new CantMoveToDestination("Error Processing Request", 1);
         }
@@ -91,7 +99,12 @@ class UploadedFile
     public function findRealType()
     {
         $finfo = new \finfo();
-        $this->realType = $finfo->file($this->tmpName, FILEINFO_MIME_TYPE);
+        // Move file to the upload folder for checking
+        $fileName = md5(microtime());
+        $destination = $this->uploadDir;
+        move_uploaded_file($this->tmpName, $destination.'/'.$fileName);
+        $this->realType = $finfo->file($destination.'/'.$fileName, FILEINFO_MIME_TYPE);
+        unlink($destination.'/'.$fileName);
 
         return $this;
     }
@@ -288,4 +301,29 @@ class UploadedFile
 
         return $this;
     }
+
+    /**
+     * Get the value of Upload Dir
+     *
+     * @return mixed
+     */
+    public function getUploadDir()
+    {
+        return $this->uploadDir;
+    }
+
+    /**
+     * Set the value of Upload Dir
+     *
+     * @param mixed uploadDir
+     *
+     * @return self
+     */
+    public function setUploadDir($uploadDir)
+    {
+        $this->uploadDir = $uploadDir;
+
+        return $this;
+    }
+
 }

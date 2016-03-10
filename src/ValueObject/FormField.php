@@ -415,7 +415,7 @@ class FormField
      * @param  [type] $files [description]
      * @return [type]        [description]
      */
-    public function compactFiles(array $files)
+    public function compactFiles(array $files, $uploadDir)
     {
       if ($this->type !== self::TYPE_FILE) {
         throw FormFieldException::notAFileUpload($this->tagName);
@@ -425,7 +425,7 @@ class FormField
         throw new NoFileUploadedException("Files are missing from payload");
       }
 
-      foreach (UploadedFile::create($this->name, $files) as $uploadedFile) {
+      foreach (UploadedFile::create($this->name, $files, $uploadDir) as $uploadedFile) {
         $this->files[] = $uploadedFile;
       }
     }
