@@ -214,12 +214,6 @@ class Form
                       return true;
                     }
 
-                    if($field->getType() == 'select' && !in_array($this->submittedData[$field->getName()], $field->getOptions())){
-                      $field->addError("Selected option is not valid.");
-
-                      return true;
-                    }
-
                     $validationResult = $field->validate();
                     if ($validationResult) {
                         $field->addError($validationResult);
