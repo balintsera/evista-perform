@@ -208,6 +208,18 @@ class Form
                         return true;
                     }
 
+                    if($field->getType() == 'email' && !filter_var($this->submittedData[$field->getName()], FILTER_VALIDATE_EMAIL)){
+                      $field->addError("Email address is not valid.");
+
+                      return true;
+                    }
+
+                    if($field->getType() == 'select' && !in_array($this->submittedData[$field->getName()], $field->getOptions())){
+                      $field->addError("Selected option is not valid.");
+
+                      return true;
+                    }
+
                     $validationResult = $field->validate();
                     if ($validationResult) {
                         $field->addError($validationResult);
