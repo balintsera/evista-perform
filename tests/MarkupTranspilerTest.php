@@ -212,6 +212,8 @@ EOF;
             >
             <input type="password" name="password" value="">
             <textarea name="test_textarea"></textarea>
+            <input type="text" name="date" pattern="onlythisvalueisvalid">
+            <input type="text" name="hungarian-telephone" pattern="(\+36|0036|06)?(\))?(-| )?[237]0\s\d{7}">
             <select name="test-select">
                 <option value="volvo">Volvo</option>
                 <option value="saab" selected>Saab</option>
@@ -222,10 +224,34 @@ EOF;
         </form>
 EOF;
         $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['email'] = 'baromság';
         $form = $factory->transpileForm($markup);
-
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+        $this->assertEquals(false, $form->getField('email')->isValid());
 
-        //@TODO Mock POST processing?
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['date'] = 'onlythisvalueisvalid';
+        $form = $factory->transpileForm($markup);
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+        $this->assertEquals(true, $form->getField('date')->isValid());
+
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['date'] = 'nooo';
+        $form = $factory->transpileForm($markup);
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+        $this->assertEquals(false, $form->getField('date')->isValid());
+
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['hungarian-telephone'] = '+36 70 6379022';
+        $form = $factory->transpileForm($markup);
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+        $this->assertEquals(true, $form->getField('hungarian-telephone')->isValid());
+
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['hungarian-telephone'] = 'ez bztos nem 122';
+        $form = $factory->transpileForm($markup);
+        $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
+        $this->assertEquals(false, $form->getField('hungarian-telephone')->isValid());
+
     }
 }

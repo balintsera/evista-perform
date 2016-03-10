@@ -208,11 +208,17 @@ class Form
                         return true;
                     }
 
-                    if($field->getType() == 'email' && !filter_var($this->submittedData[$field->getName()], FILTER_VALIDATE_EMAIL)){
-                      $field->addError("Email address is not valid.");
+                    if (null === $field->getAttribute('pattern')) {
+                        // Custom field types when no pattern set
+                        if ($field->getType() == 'email'
+                            && !filter_var($this->submittedData[$field->getName()], FILTER_VALIDATE_EMAIL)
+                        ) {
+                            $field->addError("Email address is not valid.");
 
-                      return true;
+                            return false;
+                        }
                     }
+
 
                     $validationResult = $field->validate();
                     if ($validationResult) {
@@ -231,10 +237,19 @@ class Form
     /**
      * @return mixed
      */
+    public function setSubmittedData(array $postDatas)
+    {
+        return $this->submittedData = $postDatas;
+    }
+
+    /**
+     * @return mixed
+     */
     public function getSubmittedData()
     {
         return $this->submittedData;
     }
+
 
     /**
      * Get templateVars
