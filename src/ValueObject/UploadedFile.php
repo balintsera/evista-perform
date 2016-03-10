@@ -82,7 +82,6 @@ class UploadedFile
         if (strpos($this->getRealType(), $this->getUserExtension) == 0) {
             $fileName = $this->getSafeName() . '.' . $this->getUserExtension();
         }
-        ob_start();
         
         try {
             rename($this->tmpName, $destination . '/' . $fileName);
