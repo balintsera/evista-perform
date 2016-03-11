@@ -44,7 +44,7 @@ class TranspiledForm
         // Fields
         $fields = $this->transpiler->findFields();
         if (!is_array($fields)) {
-          throw new \Exception("No fields found");
+            throw new \Exception("No fields found");
         }
 
 

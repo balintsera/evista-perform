@@ -254,4 +254,30 @@ EOF;
         $this->assertEquals(false, $form->getField('hungarian-telephone')->isValid());
 
     }
+
+    public function testSpecialValidation()
+    {
+        $markup = <<<EOF
+        <form method="post" action="/login" id="login-form">
+            <input
+            type="email"
+            name="email"
+            placeholder="Your email"
+            value=""
+         >
+
+        </form>
+EOF;
+        // Fails
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['email'] = 'baromság';
+        $form = $factory->transpileForm($markup);
+        $this->assertEquals(false, $form->getField('email')->isValid());
+
+        // Validates
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['email'] = 'balint.sera@gmail.com';
+        $form = $factory->transpileForm($markup);
+        $this->assertEquals(true, $form->getField('email')->isValid());
+    }
 }

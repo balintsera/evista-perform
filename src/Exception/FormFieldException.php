@@ -18,7 +18,7 @@ class FormFieldException extends \Exception
      */
     public static function noSuchAttribute($attributeName, $fieldTagName)
     {
-        $message = 'No such attribute ('. $attributeName . ') in field: '. $fieldTagName;
+        $message = 'No such attribute ('.$attributeName.') in field: '.$fieldTagName;
 
         return new static($message);
     }
@@ -29,22 +29,29 @@ class FormFieldException extends \Exception
      */
     public static function notASelect($fieldTagName)
     {
-        $message = 'This field is not an option type (it\'s actually a ' . $fieldTagName . ') so it has no selected option';
+        $message = 'This field is not an option type (it\'s actually a '.$fieldTagName.') so it has no selected option';
 
         return new static($message);
     }
 
     public static function noSuchFieldName($name)
     {
-      $message = 'No field named: ' . $name;
+        $message = 'No field named: '.$name;
 
-      return new static($message);
+        return new static($message);
     }
 
     public function notAFileUpload($fieldTagName)
     {
-      $message = 'This field is not file type (it\'s actually a ' . $fieldTagName . ')';
+        $message = 'This field is not file type (it\'s actually a '.$fieldTagName.')';
 
-      return new static($message);
+        return new static($message);
+    }
+
+    public static function noSuchType($type)
+    {
+        $message = 'No field type: '.$type;
+
+        return new static($message);
     }
 }

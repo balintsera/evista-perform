@@ -148,17 +148,6 @@ class FormField
     }
 
     /**
-     * @param $option
-     * @return $this
-     */
-    public function removeOption($option)
-    {
-        $this->options->removeElement($option);
-
-        return $this;
-    }
-
-    /**
      * @return array
      */
     public function getOptions()
@@ -342,10 +331,15 @@ class FormField
     public function validate()
     {
         $validateFunction = $this->validationCallback;
+        $validationResult = $validateFunction($this->getValue());
 
-        return $validateFunction($this->getValue());
+        return $validationResult;
     }
 
+    private function getDebugInfo($line)
+    {
+        return $this->getName(). ' | '. $this->getValue() . ' | ' . __CLASS__ . ':' .$line ;
+    }
     public function getDefaultSelectedOption()
     {
         if ($this->type !== self::TYPE_SELECT) {
@@ -412,22 +406,26 @@ class FormField
 
     /**
      * Compact files from uploaded files array - usually $_FILES
-     * @param  [type] $files [description]
-     * @return [type]        [description]
+     * @param array $files
+     * @param $uploadDir
+     * @throws FormFieldException
+     * @throws NoFileUploadedException
+     * @throws NoNameParam
+     * @internal param $ [type] $files [description]
      */
     public function compactFiles(array $files, $uploadDir)
     {
-      if ($this->type !== self::TYPE_FILE) {
-        throw FormFieldException::notAFileUpload($this->tagName);
-      }
+        if ($this->type !== self::TYPE_FILE) {
+            throw FormFieldException::notAFileUpload($this->tagName);
+        }
 
-      if (empty($files)) {
-        throw new NoFileUploadedException("Files are missing from payload");
-      }
+        if (empty($files)) {
+            throw new NoFileUploadedException("Files are missing from payload");
+        }
 
-      foreach (UploadedFile::create($this->name, $files, $uploadDir) as $uploadedFile) {
-        $this->files[] = $uploadedFile;
-      }
+        foreach (UploadedFile::create($this->name, $files, $uploadDir) as $uploadedFile) {
+            $this->files[] = $uploadedFile;
+        }
     }
 
     /**
@@ -436,11 +434,11 @@ class FormField
      */
     public function addFile($file)
     {
-      $this->files[] = $file;
+        $this->files[] = $file;
     }
 
     public function getFiles()
     {
-      return $this->files;
+        return $this->files;
     }
 }

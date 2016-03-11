@@ -2,7 +2,10 @@
 
 namespace Evista\Perform\Form;
 
+use Evista\Perform\Exception\FormFieldException;
 use Evista\Perform\ValueObject\FormField;
+use Evista\Perform\ValueObject\SpecialEmailValidator;
+use Evista\Perform\ValueObject\SpecialFormFieldValidatorFactory;
 
 /**
  * Created by PhpStorm.
@@ -208,24 +211,19 @@ class Form
                         return true;
                     }
 
-                    if (null === $field->getAttribute('pattern')) {
-                        // Custom field types when no pattern set
-                        if ($field->getType() == 'email'
-                            && !filter_var($this->submittedData[$field->getName()], FILTER_VALIDATE_EMAIL)
-                        ) {
-                            $field->addError("Email address is not valid.");
-
-                            return false;
-                        }
+                    // Validate special field types based on their type if no pattern was set (catch block)
+                    try {
+                        $field->getAttribute('pattern');
+                        $validationResult = $field->validate();
+                    } catch (FormFieldException $exception) {
+                        $validationResult  = $this->validateSpecialFields($field);
                     }
 
-
-                    $validationResult = $field->validate();
                     if ($validationResult) {
                         $field->addError($validationResult);
+                        return false;
                     }
-
-                    return false;
+                    return true;
                 }
             },
             $this->getFields()
@@ -234,6 +232,22 @@ class Form
         return $errors;
     }
 
+    /**
+     * Validate field based on its special type
+     * @param $field
+     * @return bool
+     */
+    public function validateSpecialFields($field)
+    {
+        try {
+            $validator =SpecialFormFieldValidatorFactory::create($field, $this->submittedData[$field->getName()]);
+            return $validator->validate();
+        } catch (FormFieldException $exception) {
+            // Can not validate this type, not validator
+            return true;
+        }
+
+    }
     /**
      * @return mixed
      */
