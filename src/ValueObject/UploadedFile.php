@@ -41,12 +41,31 @@ class UploadedFile
         $this->userExtension = $this->pathInfo['extension'];
     }
 
+    
     public static function create($fieldName, $_files, $uploadDir)
     {
 
         if (count($_files) < 1) {
             throw new NoFileUploadedException('Emtpy file');
         }
+        
+        // if the file field has a name with [] the file(s) will be 
+        // collected to an array, eg.  ['name' => [0 => 'IMG_29042016_134422.png'] }
+        // but if not, the keys value is a flat array, so it needs to be normalized
+        if (strpos($fieldName, '[]') != strlen($fieldName) - 2) {
+            $_files = array_map( 
+                function ($file) {
+                    return array_map(
+                        function ($value) {
+                            return [$value];
+                        },
+                        $file
+                    ); 
+                },
+                $_files
+            );
+        }
+        
         // $fieldName includes a '[]' when the upload is multiple
         $fieldName = str_replace(['[', ']'], '', $fieldName);
 
@@ -66,6 +85,7 @@ class UploadedFile
         }
     }
 
+    
     /**
      * Move file to destination
      * @param  [type] $destination [description]

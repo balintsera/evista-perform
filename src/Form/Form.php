@@ -324,10 +324,14 @@ class Form
     /**
      * Get a field
      * @param $key
+     * @throws FormFieldException
      * @return mixed
      */
     public function getField($key)
     {
+        if (!in_array($key, array_keys($this->formFields))) {
+            throw FormFieldException::noSuchFieldName($key);
+        }
         return $this->formFields[$key];
     }
 
