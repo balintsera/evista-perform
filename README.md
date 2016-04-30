@@ -67,7 +67,16 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
     $defaultSelected = $selectField->getDefaultSelectedOption();
 
     // Get files and handle them (multiple/single file upload)
-    $fileField = $form->getField('files');
+    try {
+        $fileField = $form->getField('files');
+    } catch (FormFieldException $formFieldException) {
+        $response = new Response();
+        $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
+        $response->setContent('Error: ' . $formFieldException->getMessage());
+        $response->send();
+        return $response;
+    }
+     
     $uploadedFiles = $fileField->getFiles();
     foreach ($uploadedFiles as $uploadedFile) {
         // Check real file type:
