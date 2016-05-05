@@ -8,7 +8,6 @@
 
 namespace Evista\Perform\ValueObject;
 
-
 use Evista\Perform\Exception\FormFieldException;
 use Evista\Perform\ValueObject\UploadedFile;
 use Evista\Perform\Exception\NoFileUploadedException;
@@ -406,11 +405,12 @@ class FormField
 
     /**
      * Compact files from uploaded files array - usually $_FILES
-     * @param array $files
-     * @param $uploadDir
-     * @throws FormFieldException
-     * @throws NoFileUploadedException
-     * @throws NoNameParam
+     *
+     * @param    array     $files
+     * @param    $uploadDir
+     * @throws   FormFieldException
+     * @throws   NoFileUploadedException
+     * @throws   NoNameParam
      * @internal param $ [type] $files [description]
      */
     public function compactFiles(array $files, $uploadDir)
@@ -430,6 +430,7 @@ class FormField
 
     /**
      * add a new uploaded file to the field
+     *
      * @param [type] $file [description]
      */
     public function addFile($file)

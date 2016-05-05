@@ -61,6 +61,7 @@ class Form
 
     /**
      * Handles submission - it's better not to call automatically
+     *
      * @throws \NoCallbackSetException
      */
     public function handleSubmission()
@@ -123,7 +124,6 @@ class Form
             ->setValidationCallback(
                 function ($value) {
                     if (function_exists('wp_verify_nonce')) {
-
                         if (!wp_verify_nonce($value, $this->nonceKey)) {
                             throw new \Exception('Unauthorized request');
                         }
@@ -148,6 +148,7 @@ class Form
 
     /**
      * Create nonce
+     *
      * @return string
      */
     private function createNonce()
@@ -186,7 +187,6 @@ class Form
                     if ($field->getType() == FormField::TYPE_CHECKBOX) {
                         $field->setValue(null);
                     }
-
                 }
             },
             $this->getFields()
@@ -195,6 +195,7 @@ class Form
 
     /**
      * Validate form input
+     *
      * @return mixed
      */
     public function validate()
@@ -234,7 +235,8 @@ class Form
 
     /**
      * Validate field based on its special type
-     * @param $field
+     *
+     * @param  $field
      * @return bool
      */
     public function validateSpecialFields($field)
@@ -267,6 +269,7 @@ class Form
 
     /**
      * Get templateVars
+     *
      * @return array
      */
     public function getTemplateVars()
@@ -276,7 +279,8 @@ class Form
 
     /**
      * Set templateVars
-     * @param array $templateVars
+     *
+     * @param  array $templateVars
      * @return $this
      */
     public function setTemplateVars(array $templateVars)
@@ -288,8 +292,9 @@ class Form
 
     /**
      * Add element to template vars
-     * @param $element
-     * @param null $key
+     *
+     * @param  $element
+     * @param  null    $key
      * @return $this
      */
     public function addToTemplateVars($element, $key = null)
@@ -301,6 +306,7 @@ class Form
 
     /**
      * Get fields
+     *
      * @return array
      */
     public function getFields()
@@ -310,8 +316,9 @@ class Form
 
     /**
      * Add a new field to the form
-     * @param $key
-     * @param $field
+     *
+     * @param  $key
+     * @param  $field
      * @return $this
      */
     public function addField($key, $field)
@@ -323,7 +330,8 @@ class Form
 
     /**
      * Get a field
-     * @param $key
+     *
+     * @param  $key
      * @throws FormFieldException
      * @return mixed
      */
@@ -337,6 +345,7 @@ class Form
 
     /**
      * Add fields to the form
+     *
      * @param array $fields
      */
     public function addFields(array $fields)
@@ -392,6 +401,4 @@ class Form
 
         return $this;
     }
-
-
 }

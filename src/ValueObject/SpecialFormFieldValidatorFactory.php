@@ -15,8 +15,9 @@ class SpecialFormFieldValidatorFactory
 {
     /**
      * Factory method to create an appropriate type
-     * @param FormField $field
-     * @param $submittedData
+     *
+     * @param  FormField     $field
+     * @param  $submittedData
      * @return SpecialEmailValidator
      * @throws FormFieldException
      */

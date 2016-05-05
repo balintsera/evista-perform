@@ -8,7 +8,6 @@
 
 namespace Evista\Perform\Exception;
 
-
 class NoFileUploadedException extends \Exception
 {
 
