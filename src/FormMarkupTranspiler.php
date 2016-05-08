@@ -20,7 +20,7 @@ use Evista\Perform\ValueObject\UploadedFile;
 
 class FormMarkupTranspiler
 {
-    const formClassNameAttrName = 'data-class';
+    const  FORM_CLASS_NAME_ATTR_NAME = 'data-class';
 
     private $crawler;
     private $markup;
@@ -72,7 +72,7 @@ class FormMarkupTranspiler
         $this->runIfNotCached(
             'formClassName',
             function () {
-                return $this->findFormTag()->attr(self::formClassNameAttrName);
+                return $this->findFormTag()->attr(self:: FORM_CLASS_NAME_ATTR_NAME);
             }
         );
 

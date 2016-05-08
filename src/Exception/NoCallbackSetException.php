@@ -1,5 +1,7 @@
 <?php
 
+namespace Evista\Perform\Exception;
+
 /**
  * Created by PhpStorm.
  * User: balint
