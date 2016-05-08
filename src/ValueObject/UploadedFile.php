@@ -49,18 +49,18 @@ class UploadedFile
             throw new NoFileUploadedException('Emtpy file');
         }
         
-        // if the file field has a name with [] the file(s) will be 
+        // if the file field has a name with [] the file(s) will be
         // collected to an array, eg.  ['name' => [0 => 'IMG_29042016_134422.png'] }
         // but if not, the keys value is a flat array, so it needs to be normalized
         if (strpos($fieldName, '[]') != strlen($fieldName) - 2) {
-            $_files = array_map( 
+            $_files = array_map(
                 function ($file) {
                     return array_map(
                         function ($value) {
                             return [$value];
                         },
                         $file
-                    ); 
+                    );
                 },
                 $_files
             );
@@ -88,6 +88,7 @@ class UploadedFile
     
     /**
      * Move file to destination
+     *
      * @param  [type] $destination [description]
      * @return $this [type]              [description]
      * @throws CantMoveToDestination
@@ -95,7 +96,7 @@ class UploadedFile
     public function moveToDestination($destination = false)
     {
         if (! $destination) {
-          $destination = $this->uploadDir;
+            $destination = $this->uploadDir;
         }
 
         $fileName = $this->getSafeName();
@@ -114,6 +115,7 @@ class UploadedFile
 
     /**
      * adds real file type
+     *
      * @return [type] [description]
      */
     public function findRealType()
@@ -132,6 +134,7 @@ class UploadedFile
 
     /**
      * adds pathinfo result to a local variable
+     *
      * @return [type] [description]
      */
     public function getPathInfo()
@@ -346,5 +349,4 @@ class UploadedFile
 
         return $this;
     }
-
 }

@@ -7,7 +7,6 @@
 
 namespace Evista\Perform\Exception;
 
-
 class CantMoveToDestination extends \Exception
 {
 

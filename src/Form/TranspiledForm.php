@@ -8,7 +8,6 @@
 
 namespace Evista\Perform\Form;
 
-
 use Evista\Perform\FormMarkupTranspiler;
 use Evista\Perform\Form\Form;
 
@@ -33,12 +32,15 @@ class TranspiledForm
 
     /**
      * Convert a markup to a BaseForm objet
+     *
      * @return mixed
      */
     public function transpile()
     {
         // Form
-        /** @var Form form */
+        /**
+ * @var Form form
+*/
         $this->form = $this->transpiler->instantiateFormObject();
 
         // Fields
@@ -61,11 +63,11 @@ class TranspiledForm
 
     /**
      * Get transpiled form
+     *
      * @return mixed
      */
     public function getForm()
     {
         return $this->form;
     }
-
 }

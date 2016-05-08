@@ -8,7 +8,6 @@
 
 namespace Evista\Perform;
 
-
 use Doctrine\Common\Collections\ArrayCollection;
 use Evista\Perform\Form\Form;
 use Evista\Perform\ValueObject\ExtendedDOMNode;
@@ -48,6 +47,7 @@ class FormMarkupTranspiler
 
     /**
      * find a form tag
+     *
      * @return mixed
      */
     public function findFormTag()
@@ -241,8 +241,9 @@ class FormMarkupTranspiler
 
     /**
      * Check if a variable is empty and run function to
+     *
      * @param $variableName
-     * @param callable $function
+     * @param callable     $function
      */
     private function runIfNotCached($variableName, callable $function)
     {
@@ -251,7 +252,6 @@ class FormMarkupTranspiler
             if (null !== $result = $function()) {
                 $this->{$variableName} = $result;
             }
-
         }
     }
 }
