@@ -180,7 +180,7 @@ class FormMarkupTranspiler
             $field->setValidationCallback(
                 function ($value) use ($pattern, $field) {
                     $validationResult = preg_match('/'.$pattern.'/', $value);
-                    //var_dump('run validation on '. $value . ' pattern: '. $pattern . ' field name: ' . $field->getName());
+                    
                     if ($validationResult) {
                         return false; // it's valid!
                     }
