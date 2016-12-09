@@ -246,7 +246,7 @@ class Form
             return $validator->validate();
         } catch (FormFieldException $exception) {
             // Can not validate this type, not validator
-            return true;
+            return false;
         }
 
     }
