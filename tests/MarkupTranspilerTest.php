@@ -251,8 +251,8 @@ EOF;
         $errors = $form->getValidationErrors();
         $this->assertTrue(is_array($errors));
         $this->assertEquals(2, count($errors));
-        $this->assertEquals('email has invalid submitted value: "baromság" but it should comply with this pattern: ^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$', $errors[0]->getErrorMessage());
-        $this->assertEquals("date has invalid submitted value: \"nooo\" but it should comply with this pattern: onlythisvalueisvalid", $errors[1]->getErrorMessage());
+        $this->assertEquals('email has invalid submitted value: "baromság" but it should comply with this pattern: ^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$', $errors['email'][0]->getErrorMessage());
+        $this->assertEquals("date has invalid submitted value: \"nooo\" but it should comply with this pattern: onlythisvalueisvalid", $errors['date'][0]->getErrorMessage());
         
         $factory = new Service(new Crawler(), './var/uploads');
         $_POST['hungarian-telephone'] = 'ez bztos nem 122';
@@ -319,5 +319,40 @@ EOF;
         $form = $factory->transpileForm($markupWithPattern);
         $this->assertEquals(true, $form->getField('email')->isValid());
         $this->assertTrue($form->isValid());
+    }
+
+    public function testErrorMessageBC()
+    {
+        $markupWithPattern = <<<EOF
+        <form method="post" action="/login" id="login-form">
+            <input
+                pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$"
+                name="email"
+                placeholder="Your email"
+                value=""
+            >
+            <textarea name="test_textarea"></textarea>
+        </form>
+EOF;
+        // Fails
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST = [];
+        $_POST['email'] = 'baromság';
+        $_POST['test_textarea'] = 'baromság';
+        $form = $factory->transpileForm($markupWithPattern);
+        $validationErrors = [];
+        foreach ($form->getFields() as $field) {
+            if (!$field->isValid()) {
+                $validationErrors[$field->getName()] = $field->getErrors();
+            }
+        }
+        
+        $expected = [
+            'email' => [
+                0 => 'email has invalid submitted value: "baromság" but it should comply with this pattern: ^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$'
+            ]
+        ];
+
+        $this->assertEquals($expected, $validationErrors);
     }
 }

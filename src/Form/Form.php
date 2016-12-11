@@ -243,7 +243,7 @@ class Form
         // All errors can be spotted in the fields
         foreach ($this->getFields() as $field) {
             if (!$field->isValid()) {
-                $this->validationErrors = array_merge($this->validationErrors, $field->getErrors());
+                $this->validationErrors[$field->getName()] = $field->getErrors(true);
             }
         }
 

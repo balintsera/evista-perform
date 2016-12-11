@@ -399,10 +399,26 @@ class FormField
 
     /**
      * @return array
+     *
+     * @param bool rich (for backward compatibilty, will be @deprecated
      */
-    public function getErrors()
+    public function getErrors($rich = false)
     {
+        if (! $rich) {
+            // trigger_error('getErrors is deprecated use getErrorObjets instead', E_USER_DEPRECATED);
+            return $this->getErrorsAsStrings();
+        }
         return $this->errors;
+    }
+
+    public function getErrorsAsStrings()
+    {
+        return array_map(
+            function (ValidationError $errorMessage) {
+                return $errorMessage->getErrorMessage();
+            },
+            $this->errors
+        );
     }
 
     /**

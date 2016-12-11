@@ -59,4 +59,14 @@ class ValidationError
             $this->errorMessage .= ' but it should comply with this pattern: ' . $this->field->getAttribute('pattern');
         }
     }
+
+    public function __toString()
+    {
+        return $this->errorMessage;
+    }
+
+    public function __sleep()
+    {
+        // TODO: Implement __sleep() method.
+    }
 }
