@@ -246,12 +246,22 @@ EOF;
         $form = $factory->transpileForm($markup);
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
         $this->assertEquals(true, $form->getField('hungarian-telephone')->isValid());
-
+        
+        // Errors
+        $errors = $form->getValidationErrors();
+        $this->assertTrue(is_array($errors));
+        $this->assertEquals(2, count($errors));
+        $this->assertEquals('email has invalid submitted value: "baromság" but it should comply with this pattern: ^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$', $errors[0]->getErrorMessage());
+        $this->assertEquals("date has invalid submitted value: \"nooo\" but it should comply with this pattern: onlythisvalueisvalid", $errors[1]->getErrorMessage());
+        
         $factory = new Service(new Crawler(), './var/uploads');
         $_POST['hungarian-telephone'] = 'ez bztos nem 122';
         $form = $factory->transpileForm($markup);
         $this->assertInstanceOf('Evista\Perform\Form\Form', $form);
         $this->assertEquals(false, $form->getField('hungarian-telephone')->isValid());
+
+        // all
+        $this->assertFalse($form->isValid());
 
     }
 
@@ -265,7 +275,7 @@ EOF;
             placeholder="Your email"
             value=""
          >
-
+        <textarea name="test_textarea"></textarea>
         </form>
 EOF;
         // Fails
@@ -273,11 +283,41 @@ EOF;
         $_POST['email'] = 'baromság';
         $form = $factory->transpileForm($markup);
         $this->assertEquals(false, $form->getField('email')->isValid());
+        $this->assertFalse($form->isValid());
 
         // Validates
         $factory = new Service(new Crawler(), './var/uploads');
         $_POST['email'] = 'balint.sera@gmail.com';
         $form = $factory->transpileForm($markup);
         $this->assertEquals(true, $form->getField('email')->isValid());
+        $this->assertTrue($form->isValid());
+
+        // pattern method, with no special field
+        $markupWithPattern = <<<EOF
+        <form method="post" action="/login" id="login-form">
+            <input
+                pattern="^([a-zA-Z0-9_.+-])+@(([a-zA-Z0-9-])+\.)+([a-zA-Z0-9]{2,4})+$"
+                name="email"
+                placeholder="Your email"
+                value=""
+            >
+            <textarea name="test_textarea"></textarea>
+        </form>
+EOF;
+        // Fails
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST = [];
+        $_POST['email'] = 'baromság';
+        $_POST['test_textarea'] = 'baromság';
+        $form = $factory->transpileForm($markupWithPattern);
+        $this->assertEquals(false, $form->getField('email')->isValid());
+        $this->assertFalse($form->isValid());
+
+        // Validates
+        $factory = new Service(new Crawler(), './var/uploads');
+        $_POST['email'] = 'balint.sera@gmail.com';
+        $form = $factory->transpileForm($markupWithPattern);
+        $this->assertEquals(true, $form->getField('email')->isValid());
+        $this->assertTrue($form->isValid());
     }
 }

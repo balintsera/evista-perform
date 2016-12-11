@@ -4,8 +4,7 @@ namespace Evista\Perform\Form;
 
 use Evista\Perform\Exception\FormFieldException;
 use Evista\Perform\ValueObject\FormField;
-use Evista\Perform\ValueObject\SpecialEmailValidator;
-use Evista\Perform\ValueObject\SpecialFormFieldValidatorFactory;
+use Evista\Perform\ValueObject\ValidationError;
 
 /**
  * Created by PhpStorm.
@@ -19,6 +18,7 @@ class Form
     private $nonceValue;
     private $submittedData;
     private $postData;
+    private $validationErrors = [];
 
     protected $formFields = [];
     protected $templateVars = ['form_fields' => []];
@@ -194,62 +194,62 @@ class Form
     }
 
     /**
-     * Validate form input
+     * Validate form input: call validate in every field and set a validation Error if not valid
      *
      * @return mixed
      */
     public function validate()
     {
-        $errors = [];
-        array_map(
-            function (FormField $field) use (&$errors) {
-                if (isset($this->submittedData[$field->getName()])) {
-                    // is it mandatory and empty?
-                    if ($field->isMandatory() && strlen($this->submittedData[$field->getName()]) < 1) {
-                        $field->addError("Mandatory");
+        foreach ($this->getFields() as $field) {
+            if (! isset($this->submittedData[$field->getName()])) {
+                continue;
+            }
+            
+            // is it mandatory and empty?
+            if ($field->isMandatory() && strlen($this->submittedData[$field->getName()]) < 1) {
+                $mandatory = new ValidationError($field, 'is mandatory');
+                $field->addError($mandatory);
 
-                        // Go to the next field, no need to validate
-                        return true;
-                    }
+                // Go to the next field, no need to validate
+                continue;
+            }
 
-                    // Validate special field types based on their type if no pattern was set (catch block)
-                    try {
-                        $field->getAttribute('pattern');
-                        $validationResult = $field->validate();
-                    } catch (FormFieldException $exception) {
-                        $validationResult  = $this->validateSpecialFields($field);
-                    }
+            $validationResult = $field->validate();
 
-                    if ($validationResult) {
-                        $field->addError($validationResult);
-                        return false;
-                    }
-                    return true;
-                }
-            },
-            $this->getFields()
-        );
-
-        return $errors;
+            if ($validationResult) {
+                $validationError = new ValidationError($field);
+                $field->addError($validationError);
+            }
+        }
     }
 
     /**
      * Validate field based on its special type
      *
-     * @param  $field
-     * @return bool
+     * @return array
      */
-    public function validateSpecialFields($field)
+    public function getValidationErrors()
     {
-        try {
-            $validator =SpecialFormFieldValidatorFactory::create($field, $this->submittedData[$field->getName()]);
-            return $validator->validate();
-        } catch (FormFieldException $exception) {
-            // Can not validate this type, not validator
-            return false;
+        if ($this->isValid()) {
+            return [];
+        }
+        
+        // if it's already cached, just return it
+        if (count($this->validationErrors) > 0) {
+            return $this->validationErrors;
         }
 
+
+        // All errors can be spotted in the fields
+        foreach ($this->getFields() as $field) {
+            if (!$field->isValid()) {
+                $this->validationErrors = array_merge($this->validationErrors, $field->getErrors());
+            }
+        }
+
+        return $this->validationErrors;
     }
+
     /**
      * @return mixed
      */

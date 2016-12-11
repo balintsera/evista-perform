@@ -102,6 +102,10 @@ $router->addRoute('POST', '/loginform', function (Request $request, Response $re
                 $validationErrors[] = $field->getErrors();
             }
         }
+        
+        // Or a lot more conveniently:
+        // This returns an array of Evista\Perform\ValueObject\ValidationError objects
+        $allValidationErrors = $form->getValidationErrors();
     }
 
     // Then send some response

@@ -11,6 +11,8 @@ namespace Evista\Perform\ValueObject;
 use Evista\Perform\Exception\FormFieldException;
 use Evista\Perform\ValueObject\UploadedFile;
 use Evista\Perform\Exception\NoFileUploadedException;
+use Evista\Perform\ValueObject\SpecialFormFieldValidatorFactory;
+use Evista\Perform\ValueObject\ValidationError;
 
 class FormField
 {
@@ -128,11 +130,16 @@ class FormField
      */
     public function getAttribute($attributeName)
     {
-        if (!array_key_exists($attributeName, $this->attributes)) {
+        if (!$this->hasAttribute($attributeName)) {
             throw FormFieldException::NoSuchAttribute($attributeName, $this->getName());
         }
 
         return $this->attributes[$attributeName];
+    }
+
+    public function hasAttribute($attributeName)
+    {
+        return array_key_exists($attributeName, $this->attributes);
     }
 
     /**
@@ -329,16 +336,42 @@ class FormField
 
     public function validate()
     {
-        $validateFunction = $this->validationCallback;
-        $validationResult = $validateFunction($this->getValue());
+        // it has a pattern attribute
+        if ($this->hasAttribute('pattern')) {
+            $validateFunction = $this->validationCallback;
+            $validationResult = $validateFunction($this->getValue());
 
-        return $validationResult;
+            return $validationResult;
+        }
+
+        // it has not 'pattern' attrib, but its maybe a php validatable field with filter_var
+        return $this->validateSpecialFields();
+
+        // Can't validate??? It's not good
+        return false;
+    }
+
+    /**
+     * Validate field based on its special type
+     *
+     * @return bool
+     */
+    public function validateSpecialFields()
+    {
+        try {
+            $validator = SpecialFormFieldValidatorFactory::create($this, $this->getValue());
+            return $validator->validate();
+        } catch (FormFieldException $exception) {
+            // @TODO this is very suboptimal. do not return? Can not validate this type, not validator
+            return false;
+        }
     }
 
     private function getDebugInfo($line)
     {
         return $this->getName(). ' | '. $this->getValue() . ' | ' . __CLASS__ . ':' .$line ;
     }
+
     public function getDefaultSelectedOption()
     {
         if ($this->type !== self::TYPE_SELECT) {
@@ -386,7 +419,7 @@ class FormField
     /**
      * @param $error
      */
-    public function addError($error)
+    public function addError(ValidationError $error)
     {
         $this->errors[] = $error;
     }
