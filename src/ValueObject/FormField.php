@@ -336,6 +336,10 @@ class FormField
 
     public function validate()
     {
+        // not mandatory, but empty
+        if (strlen($this->getValue()) == 0) {
+            return false;
+        }
         // it has a pattern attribute
         if ($this->hasAttribute('pattern')) {
             $validateFunction = $this->validationCallback;
